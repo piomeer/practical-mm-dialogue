@@ -228,9 +228,11 @@ def normalize_sample(
         ROOT_KEYS,
         TURN_KEYS,
         CATEGORY_SCENARIO,
+        TASK_OUTPUT_TYPES,
     )
 
     # Scenario alignment with first source category when clearly constrained
+    # (scene folders only; chart/receipt folders are not bound)
     cat = Path(rels[0]).parts[0] if rels else ""
     allowed_sc = CATEGORY_SCENARIO.get(cat)
     if allowed_sc and scenario not in allowed_sc:
@@ -287,8 +289,10 @@ def normalize_sample(
     id_set = {im["image_id"] for im in new_images}
     fixed_ev = [e for e in fixed_ev if e.get("image_id") in id_set]
     fo["evidence"] = fixed_ev
-    if not fo.get("output_type"):
-        fo["output_type"] = "摘要"
+    preferred_ots = TASK_OUTPUT_TYPES.get(task_type, ("摘要",))
+    cur_ot = fo.get("output_type")
+    if cur_ot not in preferred_ots:
+        fo["output_type"] = preferred_ots[0]
     if not isinstance(fo.get("answer"), str):
         fo["answer"] = ""
     sample["final_output"] = fo
@@ -305,7 +309,8 @@ def normalize_sample(
     meta["route_confidence"] = route_meta.get("confidence")
     meta["route_reason"] = route_meta.get("reason")
     meta["source_paths"] = rels
-    meta["qa_status"] = "auto_pass"
+    # format_pass = passed automatable format gates only; not human QA
+    meta["qa_status"] = "format_pass"
     sample["meta"] = meta
     return sample
 
@@ -441,6 +446,12 @@ def main() -> int:
     parser.add_argument("--paths", nargs="*", default=DEFAULT_IMAGES)
     parser.add_argument("--max-repair", type=int, default=2)
     parser.add_argument(
+        "--start-id",
+        type=int,
+        default=None,
+        help="overwrite from this sample number (e.g. 10 -> practical_mm_dialogue_000010)",
+    )
+    parser.add_argument(
         "--group-as-one",
         action="store_true",
         help="treat all --paths as one multi-image sample",
@@ -466,13 +477,21 @@ def main() -> int:
     wall0 = time.perf_counter()
     ok_n = fail_n = 0
     token_sum = 0
+    route_tok = write_tok = repair_tok = 0
     # Reserve IDs even when a job fails (failed JSON goes to logs/, not samples/)
-    next_n = int(next_sample_id(SAMPLES_OUT).rsplit("_", 1)[-1])
+    if args.start_id is not None:
+        if args.start_id < 1:
+            print("--start-id must be >= 1", file=sys.stderr)
+            return 2
+        next_n = args.start_id
+    else:
+        next_n = int(next_sample_id(SAMPLES_OUT).rsplit("_", 1)[-1])
 
     for job in jobs:
         sid = f"practical_mm_dialogue_{next_n:06d}"
         next_n += 1
         print(f"=== {sid}  paths={job} ===", flush=True)
+        job0 = time.perf_counter()
         try:
             sample, run = generate_one(
                 client, args.model, job, sid, args.max_repair, priors
@@ -492,27 +511,49 @@ def main() -> int:
             )
             continue
 
-        for k in ("route_tokens", "write_tokens", "repair_tokens"):
-            token_sum += run.get(k, 0) or 0
+        job_ms = int((time.perf_counter() - job0) * 1000)
+        run["wall_elapsed_ms"] = job_ms
+        for k, bucket in (
+            ("route_tokens", "route"),
+            ("write_tokens", "write"),
+            ("repair_tokens", "repair"),
+        ):
+            v = run.get(k, 0) or 0
+            token_sum += v
+            if bucket == "route":
+                route_tok += v
+            elif bucket == "write":
+                write_tok += v
+            else:
+                repair_tok += v
 
         if run.get("ok"):
             ok_n += 1
             print(
                 f"  OK task={run.get('task_type')} conf={run.get('route', {}).get('confidence')} "
-                f"repairs={run.get('repair_rounds')} -> {run.get('out_path')}",
+                f"repairs={run.get('repair_rounds')} tokens_r/w/fix="
+                f"{run.get('route_tokens', 0)}/{run.get('write_tokens', 0)}/{run.get('repair_tokens', 0)} "
+                f"wall_ms={job_ms} -> {run.get('out_path')}",
                 flush=True,
             )
         else:
             fail_n += 1
             print(
-                f"  FAIL task={run.get('task_type')} errors={run.get('final_errors')}",
+                f"  FAIL task={run.get('task_type')} errors={run.get('final_errors')} "
+                f"tokens_r/w/fix="
+                f"{run.get('route_tokens', 0)}/{run.get('write_tokens', 0)}/{run.get('repair_tokens', 0)} "
+                f"wall_ms={job_ms}",
                 flush=True,
             )
 
     wall_ms = int((time.perf_counter() - wall0) * 1000)
     print("---")
     print(f"ok={ok_n} fail={fail_n} jobs={len(jobs)}")
-    print(f"approx_stage_tokens_sum={token_sum} wall_elapsed_ms={wall_ms}")
+    print(
+        f"tokens_total={token_sum} "
+        f"(route={route_tok} write={write_tok} repair={repair_tok})"
+    )
+    print(f"wall_elapsed_ms={wall_ms} (~{wall_ms / 1000:.1f}s)")
     print(f"usage_log={USAGE_PATH}")
     print(f"run_log={GEN_LOG}")
     return 0 if fail_n == 0 else 1

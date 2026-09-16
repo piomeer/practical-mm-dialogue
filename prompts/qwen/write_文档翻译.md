@@ -5,9 +5,10 @@
 硬要求：
 1. 只输出完整样本 JSON，无代码围栏。
 2. 对话 4~6 轮：确认范围/方向 → 初译 → 润色/术语 → 定稿。
-3. `<image>` 只能在 user 轮。
-4. final_output.output_type=「翻译稿」；answer ⊆ 末轮助手。
-5. evidence 标明译自图中哪些文字块；禁止占位句。
-6. 不编造图中没有的句子。
+3. 首轮 user 须点明翻译方向与范围，禁止仅 `<image>` / `[图片]`。
+4. `<image>` 只能在 user 轮。
+5. final_output.output_type=「翻译稿」；answer ⊆ 末轮助手。
+6. evidence 标明译自图中哪些文字块；禁止占位句。
+7. 不编造图中没有的句子。
 
 task_type 必须为「文档翻译」。

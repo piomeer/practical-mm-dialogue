@@ -1,7 +1,7 @@
 {
-  "task_type": "逻辑推理",
   "sample_id": "practical_mm_dialogue_000014",
-  "scenario": "生活",
+  "task_type": "逻辑推理",
+  "scenario": "学习",
   "images": [
     {
       "image_id": "img_001",
@@ -11,60 +11,70 @@
   "dialogue": [
     {
       "role": "user",
-      "content": "<image>这张美国对中国的看法变化趋势图显示什么整体特征？",
+      "content": "<image>请分析这个图表中美国对华好感度和不好感度的变化趋势，并指出关键转折点。",
       "turn_id": 1
     },
     {
       "role": "assistant",
-      "content": "请先确认图表中的两条曲线分别代表'Favorable'（积极）和'Unfavorable'（消极）评价，纵轴为百分比，横轴为2005-2015年时间跨度。需要进一步分析吗？",
+      "content": "图表展示了2005至2015年间美国民众对中国\"好感度\"（绿色线）与\"不好感度\"（橙色线）的比例变化。需重点观察哪几年的数据？",
       "turn_id": 2
     },
     {
       "role": "user",
-      "content": "能提取2005年和2015年的关键数据点吗？",
+      "content": "请找出2009年和2013年的好感度与不好感度数值，并说明这两年间趋势有何差异。",
       "turn_id": 3
     },
     {
       "role": "assistant",
-      "content": "2005年：Favorable=43%，Unfavorable=35%；2015年：Favorable=38%，Unfavorable=54%。发现什么对比结果？",
+      "content": "2009年好感度50% vs 不好感度38%；2013年好感度40% vs 不好感度52%。十年间出现从\"好感主导\"转向\"不看好主导\"的趋势逆转。",
       "turn_id": 4
     },
     {
       "role": "user",
-      "content": "趋势是否出现反转？",
+      "content": "为什么在2013年之后，美国对华好感度持续下降？可能的原因是什么？",
       "turn_id": 5
     },
     {
       "role": "assistant",
-      "content": "2013年后Unfavorable持续超过Favorable，2015年差距达16个百分点，呈现明确反向趋势。数据来源为PEW Research Center 2015年调查Q12b。",
+      "content": "图表未给出因果说明，仅显示数据变化。根据视觉呈现可知2015年好感度降至38%（历史最低），不好感度升至54%（历史最高）。",
       "turn_id": 6
+    },
+    {
+      "role": "user",
+      "content": "请综合上述分析，总结美国对中国的看法在这一时期内的整体趋势。",
+      "turn_id": 7
+    },
+    {
+      "role": "assistant",
+      "content": "1. 2005-2011年：好感与不好感交替波动（最大差值21%）；2. 2013年起明显反转，好感持续下滑且差距扩大至16个百分点；3. 终点值显示极端分化（54%vs38%）。",
+      "turn_id": 8
     }
   ],
   "final_output": {
     "output_type": "推理结论",
-    "answer": "2013年后Unfavorable持续超过Favorable，2015年差距达16个百分点，呈现明确反向趋势。数据来源为PEW Research Center 2015年调查Q12b。",
+    "answer": "1. 2005-2011年：好感与不好感交替波动（最大差值21%）；2. 2013年起明显反转，好感持续下滑且差距扩大至16个百分点；3. 终点值显示极端分化（54%vs38%）。",
     "evidence": [
       {
         "image_id": "img_001",
-        "evidence_text": "图例中明确标注橙色曲线标签为Unfavorable，绿色曲线标签为Favorable"
+        "evidence_text": "2005年起点数据显示好感度43%，不好感度35%；2013年数据发生逆转，好感度37%降至低于不好感度52%；2015年终点数据显示好感度38%，不好感度54%，形成极端分化格局。"
       },
       {
         "image_id": "img_001",
-        "evidence_text": "2015年横坐标上方标记数据显示Orange曲线值为54，Green曲线值为38"
+        "evidence_text": "图表标题 \"Americans Give China Mostly Negative Ratings\" 及 \"U.S. views of China\"，Source: Spring 2015 Global Attitudes survey. Q12b. PEW RESEARCH CENTER。"
       }
     ]
   },
   "meta": {
     "language": "zh",
-    "turn_count": 6,
+    "turn_count": 8,
     "image_count": 1,
     "difficulty": "中等",
     "routed_task_type": "逻辑推理",
-    "route_confidence": 0.9,
-    "route_reason": "图片为包含时间序列数据的折线图，需要分析数据趋势和关系，符合逻辑推理的定义。",
+    "route_confidence": 0.95,
+    "route_reason": "遵循规则6，折线图涉及趋势对比与分析，应优先归类为逻辑推理；目录 prior 也指向逻辑推理。",
     "source_paths": [
       "图表推理/0001chartqa_10095.jpg"
     ],
-    "qa_status": "auto_pass"
+    "qa_status": "format_pass"
   }
 }

@@ -32,6 +32,18 @@ ALLOWED_OUTPUT_TYPES = {
     "推理结论",
 }
 
+# task_type -> allowed output_types (first entry is preferred default)
+TASK_OUTPUT_TYPES: dict[str, tuple[str, ...]] = {
+    "看图创作": ("创作文案",),
+    "信息提取与整理": ("表格",),
+    "文档翻译": ("翻译稿",),
+    "生活/工作/学习实用问题": ("行动计划",),
+    "逻辑推理": ("推理结论", "摘要"),
+    "代码debug": ("修复方案",),
+    "深度研究": ("研究报告", "摘要"),
+    "多跳搜索": ("研究报告", "摘要"),
+}
+
 ROOT_KEYS = {"sample_id", "task_type", "scenario", "images", "dialogue", "final_output", "meta"}
 IMAGE_KEYS = {"image_id", "image_path"}
 TURN_KEYS = {"turn_id", "role", "content"}
@@ -49,24 +61,72 @@ META_KEYS = {
     "qa_status",
 }
 
+# Only scene folders are hard-bound; chart/receipt folders are modality, not scenario.
 CATEGORY_SCENARIO = {
     "生活场景": {"生活"},
     "工作场景": {"工作"},
     "学习材料": {"学习"},
-    "图表推理": {"工作", "学习"},
     "文档截图": {"工作", "学习", "生活"},
     "代码报错": {"工作", "学习"},
 }
 
+ALLOWED_QA_STATUS = {"format_pass", "human_pass", "rejected", "auto_pass"}
+
 PLACEHOLDER_EVIDENCE = re.compile(
     r"(^见图\b)|(与任务相关的可见内容)|(见图中与任务相关)"
 )
+
+# Lazy / incomplete markdown table markers
+TABLE_LAZY = re.compile(
+    r"(\.{3}|…|（?其他(?:类似)?字段略）?|其余略|字段略|内容略|（省略|略\）)"
+)
+
+FIRST_TURN_PLACEHOLDER = re.compile(
+    r"(\[图片\]|【图片】|\(图片\)|（图片）|^图片$)"
+)
+
+MIN_FIRST_USER_INTENT_CHARS = 8
 
 
 def _extra_keys(obj: dict, allowed: set[str], prefix: str, errs: list[str]) -> None:
     bad = sorted(set(obj.keys()) - allowed)
     for k in bad:
         errs.append(f"{prefix} unexpected field: {k}")
+
+
+def _strip_first_user_intent(content: str) -> str:
+    text = content.replace("<image>", "")
+    text = FIRST_TURN_PLACEHOLDER.sub("", text)
+    text = re.sub(r"\s+", "", text)
+    return text
+
+
+def _markdown_table_data_rows(text: str) -> int:
+    """Count non-separator table rows that look like data (have pipes)."""
+    rows = 0
+    for line in text.splitlines():
+        s = line.strip()
+        if "|" not in s:
+            continue
+        # separator like |---|---|
+        if re.match(r"^\|?[\s:\-|]+\|?$", s):
+            continue
+        rows += 1
+    # rows includes header; data rows = rows - 1
+    return max(0, rows - 1)
+
+
+def _check_table_quality(text: str, label: str, errs: list[str]) -> None:
+    if TABLE_LAZY.search(text):
+        errs.append(f"{label}: markdown table looks incomplete (ellipsis/略/其他字段略)")
+    data_rows = _markdown_table_data_rows(text)
+    # Wide single-row delivery tables (e.g. one receipt summary) are valid;
+    # lazy ellipsis rows are already banned above.
+    if data_rows < 1:
+        errs.append(
+            f"{label}: markdown table needs header + at least 1 data row "
+            f"(found {data_rows} data rows)"
+        )
 
 
 def validate_sample(data: dict, *, check_image_files: bool = False, images_root: Path | None = None) -> list[str]:
@@ -150,6 +210,14 @@ def validate_sample(data: dict, *, check_image_files: bool = False, images_root:
                 errs.append(f"dialogue[{i}]: <image> must only appear in user turns")
         if i == 0 and role != "user":
             errs.append("dialogue must start with user")
+        if i == 0 and role == "user" and isinstance(content, str):
+            intent = _strip_first_user_intent(content)
+            if len(intent) < MIN_FIRST_USER_INTENT_CHARS:
+                errs.append(
+                    f"first user turn must state a task intent "
+                    f"(≥{MIN_FIRST_USER_INTENT_CHARS} chars after removing <image>/placeholders), "
+                    f"got {len(intent)}"
+                )
         if prev_role is not None and role == prev_role:
             errs.append(f"dialogue[{i}] role should alternate, got consecutive {role}")
         prev_role = role
@@ -170,12 +238,22 @@ def validate_sample(data: dict, *, check_image_files: bool = False, images_root:
     ot = fo.get("output_type")
     if ot not in ALLOWED_OUTPUT_TYPES:
         errs.append(f"final_output.output_type invalid: {ot!r}")
-    elif isinstance(answer, str) and answer.strip():
-        if ot == "表格" and "|" not in answer:
-            errs.append("output_type=表格 but answer has no markdown table pipes")
-        if ot == "行动计划":
-            if not re.search(r"(^|\n)\s*([0-9]+[\.、\)]|[-*•])\s+", answer):
-                errs.append("output_type=行动计划 but answer has no numbered/bulleted steps")
+    else:
+        allowed_ot = TASK_OUTPUT_TYPES.get(task_type) if task_type in ALLOWED_TASK_TYPES else None
+        if allowed_ot is not None and ot not in allowed_ot:
+            errs.append(
+                f"output_type={ot!r} not allowed for task_type={task_type!r} "
+                f"(expected one of {list(allowed_ot)})"
+            )
+        if isinstance(answer, str) and answer.strip():
+            if ot == "表格":
+                if "|" not in answer:
+                    errs.append("output_type=表格 but answer has no markdown table pipes")
+                else:
+                    _check_table_quality(answer, "final_output.answer", errs)
+            if ot == "行动计划":
+                if not re.search(r"(^|\n)\s*([0-9]+[\.、\)]|[-*•])\s+", answer):
+                    errs.append("output_type=行动计划 but answer has no numbered/bulleted steps")
 
     evidence = fo.get("evidence")
     if not isinstance(evidence, list) or not evidence:
@@ -209,6 +287,13 @@ def validate_sample(data: dict, *, check_image_files: bool = False, images_root:
                 "final_output.answer must be contained in the last assistant turn "
                 "(no content only in answer)"
             )
+        # Also reject lazy tables hiding only in last assistant when answer is 表格
+        if ot == "表格" and isinstance(last_assistant, str) and "|" in last_assistant:
+            if TABLE_LAZY.search(last_assistant):
+                errs.append(
+                    "last assistant turn: markdown table looks incomplete "
+                    "(ellipsis/略/其他字段略)"
+                )
 
     meta = data.get("meta")
     if not isinstance(meta, dict):
@@ -230,7 +315,14 @@ def validate_sample(data: dict, *, check_image_files: bool = False, images_root:
     if meta.get("difficulty") not in ALLOWED_DIFFICULTY:
         errs.append(f"meta.difficulty invalid: {meta.get('difficulty')!r}")
 
-    # scenario vs source_paths category
+    qs = meta.get("qa_status")
+    if qs is not None and qs not in ALLOWED_QA_STATUS:
+        errs.append(
+            f"meta.qa_status invalid: {qs!r} "
+            f"(allowed: format_pass/human_pass/rejected; auto_pass legacy-ok)"
+        )
+
+    # scenario vs source_paths category (scene folders only)
     src = meta.get("source_paths")
     if isinstance(src, list) and src and scenario in ALLOWED_SCENARIOS:
         for sp in src:
@@ -248,7 +340,7 @@ def validate_sample(data: dict, *, check_image_files: bool = False, images_root:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Validate practical_mm_dialogue sample JSON")
+    parser = argparse.ArgumentParser(description="Validate practical multimodal dialogue sample JSON")
     parser.add_argument("path", type=Path, help="sample JSON path")
     parser.add_argument(
         "--check-files",

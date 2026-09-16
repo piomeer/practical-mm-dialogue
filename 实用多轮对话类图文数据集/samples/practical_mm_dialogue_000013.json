@@ -11,56 +11,50 @@
   "dialogue": [
     {
       "role": "user",
-      "content": "<image>请提取这张2011年度业绩报告中的财务数据字段",
+      "content": "<image>请从该幻灯片中提取2011财年业绩的关键财务指标（含单位），按类别整理为表格格式，保留原始数值和百分比标注。",
       "turn_id": 1
     },
     {
       "role": "assistant",
-      "content": "初步整理如下数据（待确认）：\n- Sales: 83.6 bn\n- Organic Growth: +7.5%\n- Trading Operating Profit: 12.5 bn\n（其他字段需核对排版一致性）",
+      "content": "已识别图中主要财务数据。以下为初始整理结果：\n\n| 项目 | 报告值 | 同比变化 |\n|------|--------|----------|\n| 销售额 | 83.6 bn | - |",
       "turn_id": 2
     },
     {
       "role": "user",
-      "content": "补充'Net Profit Margin'的margin值和对比标注是否齐全？",
+      "content": "需补充‘组织增长率’‘实际内部增长’等细分项，同时删除无关注释文字（如vs.2010 continuing operations）",
       "turn_id": 3
     },
     {
       "role": "assistant",
-      "content": "已修正Net Profit Margin为11.3%，+130 bps。底部'All figures in CHF'需统一添加单位说明。\n（建议表格增加'备注'列）",
+      "content": "修正后完整表格如下：\n\n| 项目名称 | As reported数值 | 同比变化 | At constant exchange rates |\n|------------------------------|-----------------|----------|---------------------------|\n| Sales | 83.6 bn | +7.5% | +90 bps |\n| Organic Growth | +7.5% | - | - |\n| Real Internal Growth | +3.9% | - | - |\n| Trading Operating Profit | 12.5 bn | - | - |\n| Trading Operating Profit Margin | 15.0% | +60 bps | +90 bps |\n| Net Profit | 9.5 bn | +8.1% | - |\n| Net Profit Margin | 11.3% | +130 bps | - |\n| Underlying EPS | 3.08 | - | +7.8% |\n| Dividend (proposed) | 1.95 | +5.4% | - |",
       "turn_id": 4
-    },
-    {
-      "role": "user",
-      "content": "最终交付表需包含'As reported'和'At constant exchange rates'两列数据",
-      "turn_id": 5
-    },
-    {
-      "role": "assistant",
-      "content": "以下是完整交付表：\n| 项目 | As reported | At constant exchange rates | 备注 |\n|---|---|---|---|\n| Sales | 83.6 bn | - | All figures in CHF |\n| Organic Growth | +7.5% | - | (vs. prior year) |\n| ... | ... | ... | （其他类似字段略）|",
-      "turn_id": 6
     }
   ],
   "final_output": {
     "output_type": "表格",
-    "answer": "以下是完整交付表：\n| 项目 | As reported | At constant exchange rates | 备注 |\n|---|---|---|---|\n| Sales | 83.6 bn | - | All figures in CHF |\n| Organic Growth | +7.5% | - | (vs. prior year) |\n| ... | ... | ... | （其他类似字段略）|",
+    "answer": "修正后完整表格如下：\n\n| 项目名称 | As reported数值 | 同比变化 | At constant exchange rates |\n|------------------------------|-----------------|----------|---------------------------|\n| Sales | 83.6 bn | +7.5% | +90 bps |\n| Organic Growth | +7.5% | - | - |\n| Real Internal Growth | +3.9% | - | - |\n| Trading Operating Profit | 12.5 bn | - | - |\n| Trading Operating Profit Margin | 15.0% | +60 bps | +90 bps |\n| Net Profit | 9.5 bn | +8.1% | - |\n| Net Profit Margin | 11.3% | +130 bps | - |\n| Underlying EPS | 3.08 | - | +7.8% |\n| Dividend (proposed) | 1.95 | +5.4% | - |",
     "evidence": [
       {
         "image_id": "img_001",
-        "evidence_text": "图片标题为 '2011: Strong Full Year Performance'，表格显示 Sales 为 83.6 bn，Trading Operating Profit 为 12.5 bn"
+        "evidence_text": "图片主体展示了以 Sales 为首行的财务指标表格，包含 Trading Operating Profit、Net Profit 等具体行项及对应数值"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "图片左下角明确标注文本 'All figures in CHF'，说明所有数值的单位为瑞士法郎"
       }
     ]
   },
   "meta": {
     "language": "zh",
-    "turn_count": 6,
+    "turn_count": 4,
     "image_count": 1,
     "difficulty": "中等",
     "routed_task_type": "信息提取与整理",
-    "route_confidence": 0.95,
-    "route_reason": "图片内容为结构化的财务数据表格，属于典型的工作场景文档，主要意图通常为提取关键指标或整理数据摘要。",
+    "route_confidence": 0.9,
+    "route_reason": "图片为包含具体财务指标的商务报表截图，场景明显为工作汇报或分析，最可能的需求是提取关键数据并进行归纳。",
     "source_paths": [
       "文档截图/0001slide_2012_02_20fy11roadshow_12022102244.jpg"
     ],
-    "qa_status": "auto_pass"
+    "qa_status": "format_pass"
   }
 }
