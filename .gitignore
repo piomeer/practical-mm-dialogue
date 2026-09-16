@@ -1,0 +1,24 @@
+*.pyc
+.DS_Store
+.env
+.venv/
+__pycache__/
+*.zip
+
+# Bulk image pools stay local (not pushed to GitHub)
+data/**/*.jpg
+data/**/*.jpeg
+data/**/*.png
+data/**/*.webp
+data_used/**/*.jpg
+data_used/**/*.jpeg
+data_used/**/*.png
+data_used/**/*.webp
+
+# Keep folder scaffolding and docs
+!data/**/.gitkeep
+!data_used/**/.gitkeep
+!data/README.md
+!data_used/README.md
+!data/_meta/
+!data/_meta/**

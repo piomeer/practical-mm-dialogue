@@ -1,0 +1,49 @@
+{
+  "sample_id": "practical_mm_dialogue_000001",
+  "task_type": "信息提取与整理",
+  "scenario": "生活",
+  "images": [
+    {
+      "image_id": "img_001",
+      "image_path": "images/0001mcdonalds收据.jpg"
+    }
+  ],
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "role": "user",
+      "content": "<image>这是一张麦当劳收据，请帮我提取记账/报销常用的关键字段，金额和品项要按图中原文来。"
+    },
+    {
+      "turn_id": 2,
+      "role": "assistant",
+      "content": "已根据收据截图提取关键字段（电话已脱敏）：\n\n| 字段 | 内容 |\n| --- | --- |\n| 单据类型 | TAX INVOICE |\n| 商户 | Gerbang Alaf Restaurants Sdn Bhd（Licensee of McDonald's） |\n| 门店 | McDonald's BHP Taman Melawati (#328) |\n| GST ID | 000504664064 |\n| 电话 | 03-****-****（已脱敏） |\n| 发票号 INV# | 003281900229170 |\n| 订单号 ORD # | 50（REG #19） |\n| 日期时间 | 18/01/2018 10:27:03 |\n| 品项 | 2 ChicMcMuffin 11.00；1 M Porridge 5.60；1 BM 2HotCakes 10.00；1 L Coke（未单独标价，疑似套餐） |\n| TakeOut Total (incl GST) | 26.60 |\n| Total Rounded | 26.60 |\n| 现金支付 | 100.00 |\n| 找零 | 73.40 |\n| 含税说明 | TOTAL INCLUDES 6% GST 1.51 |\n| 手写批注 | 右上角红字，疑似「KL perry 0598」（字迹略糊，识读有不确定） |\n\n顶部大号「1950」可见，含义不明确，暂未当作金额字段。"
+    },
+    {
+      "turn_id": 3,
+      "role": "user",
+      "content": "请整理成一张可直接粘贴进记账表的交付表格，并把右上角手写备注单独成列；电话继续脱敏。"
+    },
+    {
+      "turn_id": 4,
+      "role": "assistant",
+      "content": "可交付记账表如下（电话已脱敏）：\n\n| 日期 | 商户/门店 | 发票号 | 品项摘要 | 价税合计 | 支付/找零 | 税费 | 手写备注 | 备注 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| 2018-01-18 10:27:03 | McDonald's BHP Taman Melawati (#328) | 003281900229170 | ChicMcMuffin×2、M Porridge×1、BM 2HotCakes×1、L Coke×1 | 26.60 | 现金100.00 / 找零73.40 | GST 6% 计1.51 | KL perry 0598（识读存疑） | TAX INVOICE；外带合计与取整均为26.60 |\n\n使用注意：L Coke 未单独标价，若需拆分行项目请以套餐规则另行确认；红字手写建议人工再核一眼。"
+    }
+  ],
+  "final_output": {
+    "answer": "| 日期 | 商户/门店 | 发票号 | 品项摘要 | 价税合计 | 支付/找零 | 税费 | 手写备注 | 备注 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| 2018-01-18 10:27:03 | McDonald's BHP Taman Melawati (#328) | 003281900229170 | ChicMcMuffin×2、M Porridge×1、BM 2HotCakes×1、L Coke×1 | 26.60 | 现金100.00 / 找零73.40 | GST 6% 计1.51 | KL perry 0598（识读存疑） | TAX INVOICE；外带合计与取整均为26.60 |",
+    "output_type": "表格",
+    "evidence": [
+      {
+        "image_id": "img_001",
+        "evidence_text": "TAX INVOICE；门店 McDonald's BHP Taman Melawati (#328)；INV# 003281900229170；ORD #50 18/01/2018 10:27:03；品项 ChicMcMuffin/M Porridge/BM 2HotCakes/L Coke；TakeOut Total 26.60；Cash 100.00 Change 73.40；6% GST 1.51；右上角红字手写"
+      }
+    ]
+  },
+  "meta": {
+    "language": "zh",
+    "turn_count": 4,
+    "image_count": 1,
+    "difficulty": "中等"
+  }
+}

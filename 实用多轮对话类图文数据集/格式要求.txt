@@ -1,0 +1,53 @@
+{
+  "sample_id": "practical_mm_dialogue_000001",
+  "task_type": "看图创作/信息提取与整理/文档翻译/代码debug/逻辑推理/深度研究/多跳搜索",
+  "scenario": "生活/工作/学习",
+  "images": [
+    {
+      "image_id": "img_001",
+      "image_path": "images/practical_mm_dialogue_000001_img_001.jpg",
+   },
+   {
+    "image_id": "img_002",
+    "image_path": "images/practical_mm_dialogue_000001_img_002.jpg",
+   }
+  ],
+  "dialogue": [ # 对话中插入<image>表示这里有新图传入，顺序与images列表中的顺序一致
+    {
+      "turn_id": 1,
+      "role": "user",
+      "content": "<image>帮我看一下这张图里有哪些关键信息。"
+    },
+    {
+      "turn_id": 2,
+      "role": "assistant",
+      "content": "图中主要包含……"
+    },
+    {
+      "turn_id": 3,
+      "role": "user",
+      "content": "请基于这些信息，结合图2<image>内容，整理成表格，并指出需要补充确认的地方。"
+    },
+    {
+      "turn_id": 4,
+      "role": "assistant",
+      "content": "已整理如下……"
+    }
+  ],
+  "final_output": {
+    "answer": "",
+    "output_type": "摘要/表格/翻译稿/修复方案/研究报告/行动计划/创作文案",
+    "evidence": [
+      {
+        "image_id": "img_001",
+        "evidence_text": "对应图片中的关键信息或区域描述"
+      }
+    ]
+  },
+  "meta": {
+    "language": "zh",
+    "turn_count": 4,
+    "image_count": 2,
+    "difficulty": "基础/中等/困难",
+  },
+}
