@@ -1,0 +1,66 @@
+{
+  "sample_id": "practical_mm_dialogue_000011",
+  "task_type": "看图创作",
+  "scenario": "生活",
+  "images": [
+    {
+      "image_id": "img_001",
+      "image_path": "images/0005a_picnic_spread_with_waffles_and_berries.jpg"
+    }
+  ],
+  "dialogue": [
+    {
+      "role": "user",
+      "content": "<image>请根据这张春日野餐图写朋友圈文案，需要突出浪漫氛围！",
+      "turn_id": 1
+    },
+    {
+      "role": "assistant",
+      "content": "🌸春日限定野餐时光｜柳条篮里装满阳光的味道～\n\n（初稿待细化）",
+      "turn_id": 2
+    },
+    {
+      "role": "user",
+      "content": "可以补充具体物件细节吗？华夫饼和蓝莓要写实些",
+      "turn_id": 3
+    },
+    {
+      "role": "assistant",
+      "content": "🍃当樱花撞上野餐垫\n米白棉布铺满草地，柳条篮敞开着露出格纹内衬\n华夫饼脆皮叠着蓝莓酱，陶杯盛满晨间雾气\n草编帽檐压着半片花瓣，风铃般的蒲公英沙沙作响\n\n（需补充场景互动感）",
+      "turn_id": 4
+    },
+    {
+      "role": "user",
+      "content": "调整为小红书风格，加入#春日野餐 话题",
+      "turn_id": 5
+    },
+    {
+      "role": "assistant",
+      "content": "#春日野餐 #浪漫食光 🌷\n\n「把春天装进柳条篮」\n▫️编织篮盖印着阳光条纹\n▫️华夫饼干脆配蓝莓釉彩\n▫️雏菊插在牛奶罐里摇晃\n▫️草编帽沿还沾着露水\n\n#治愈系风景 #小众野餐地\n（附定位）",
+      "turn_id": 6
+    }
+  ],
+  "final_output": {
+    "answer": "#春日野餐 #浪漫食光 🌷\n\n「把春天装进柳条篮」\n▫️编织篮盖印着阳光条纹\n▫️华夫饼干脆配蓝莓釉彩\n▫️雏菊插在牛奶罐里摇晃\n▫️草编帽沿还沾着露水\n\n#治愈系风景 #小众野餐地\n（附定位）",
+    "evidence": [
+      {
+        "image_id": "img_001",
+        "evidence_text": "图中展示米白棉布铺满草地，柳条篮呈打开状态，内部可见格纹内衬；桌上摆放着带裂纹的华夫饼与蓝莓，旁边有草编帽和一束白色小花插在陶瓷容器中。"
+      }
+    ],
+    "output_type": "摘要"
+  },
+  "meta": {
+    "language": "zh",
+    "turn_count": 6,
+    "image_count": 1,
+    "difficulty": "中等",
+    "routed_task_type": "看图创作",
+    "route_confidence": 0.9,
+    "route_reason": "图片呈现的是温馨的氛围化生活场景，且目录偏好已明确指向看图创作，适合基于画面内容进行文案撰写或意境描述",
+    "source_paths": [
+      "生活场景/0005a_picnic_spread_with_waffles_and_berries.jpg"
+    ],
+    "qa_status": "auto_pass"
+  }
+}

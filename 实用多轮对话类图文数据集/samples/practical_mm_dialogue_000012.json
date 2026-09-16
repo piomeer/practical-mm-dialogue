@@ -1,0 +1,64 @@
+{
+  "sample_id": "practical_mm_dialogue_000012",
+  "task_type": "生活/工作/学习实用问题",
+  "scenario": "工作",
+  "images": [
+    {
+      "image_id": "img_001",
+      "image_path": "images/0001abbotsford_house_study_room.jpg"
+    }
+  ],
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "role": "user",
+      "content": "<image>"
+    },
+    {
+      "turn_id": 2,
+      "role": "assistant",
+      "content": "这是一间古典风格的书房，墙壁布满藏书柜，中央设有壁炉和宽敞书桌。"
+    },
+    {
+      "turn_id": 3,
+      "role": "user",
+      "content": "书桌和书架的设计有什么实用优势？"
+    },
+    {
+      "turn_id": 4,
+      "role": "assistant",
+      "content": "宽大书桌适合办公操作，多层书架高效利用垂直空间存储书籍，壁炉提供冬季取暖功能。桌面摆放标识牌'Study 2'，明确房间用途为专用书房区域。"
+    }
+  ],
+  "final_output": {
+    "evidence": [
+      {
+        "image_id": "img_001",
+        "evidence_text": "墙面密布三层带铁网防护的木质书架，上层延伸出二层走廊式书架。"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "中央黑色大理石壁炉配有金属格栅装饰，上方悬挂黑框版画。"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "深色雕花木桌左侧摆放'Study 2'标识牌，桌面保留空白区域。"
+      }
+    ],
+    "output_type": "摘要",
+    "answer": "桌面摆放标识牌'Study 2'，明确房间用途为专用书房区域。"
+  },
+  "meta": {
+    "language": "zh",
+    "turn_count": 4,
+    "image_count": 1,
+    "difficulty": "中等",
+    "routed_task_type": "生活/工作/学习实用问题",
+    "route_confidence": 0.85,
+    "route_reason": "基于目录分类为工作场景及用户设定的实用问题偏好，推测用户旨在咨询书房的空间利用、风格营造或办公环境优化等实际问题。",
+    "source_paths": [
+      "工作场景/0001abbotsford_house_study_room.jpg"
+    ],
+    "qa_status": "auto_pass"
+  }
+}

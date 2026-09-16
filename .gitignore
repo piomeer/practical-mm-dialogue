@@ -4,6 +4,7 @@
 .venv/
 __pycache__/
 *.zip
+logs/
 
 # Bulk image pools stay local (not pushed to GitHub)
 data/**/*.jpg

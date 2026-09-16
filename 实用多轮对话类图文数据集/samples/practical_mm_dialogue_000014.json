@@ -1,0 +1,70 @@
+{
+  "task_type": "逻辑推理",
+  "sample_id": "practical_mm_dialogue_000014",
+  "scenario": "生活",
+  "images": [
+    {
+      "image_id": "img_001",
+      "image_path": "images/0001chartqa_10095.jpg"
+    }
+  ],
+  "dialogue": [
+    {
+      "role": "user",
+      "content": "<image>这张美国对中国的看法变化趋势图显示什么整体特征？",
+      "turn_id": 1
+    },
+    {
+      "role": "assistant",
+      "content": "请先确认图表中的两条曲线分别代表'Favorable'（积极）和'Unfavorable'（消极）评价，纵轴为百分比，横轴为2005-2015年时间跨度。需要进一步分析吗？",
+      "turn_id": 2
+    },
+    {
+      "role": "user",
+      "content": "能提取2005年和2015年的关键数据点吗？",
+      "turn_id": 3
+    },
+    {
+      "role": "assistant",
+      "content": "2005年：Favorable=43%，Unfavorable=35%；2015年：Favorable=38%，Unfavorable=54%。发现什么对比结果？",
+      "turn_id": 4
+    },
+    {
+      "role": "user",
+      "content": "趋势是否出现反转？",
+      "turn_id": 5
+    },
+    {
+      "role": "assistant",
+      "content": "2013年后Unfavorable持续超过Favorable，2015年差距达16个百分点，呈现明确反向趋势。数据来源为PEW Research Center 2015年调查Q12b。",
+      "turn_id": 6
+    }
+  ],
+  "final_output": {
+    "output_type": "推理结论",
+    "answer": "2013年后Unfavorable持续超过Favorable，2015年差距达16个百分点，呈现明确反向趋势。数据来源为PEW Research Center 2015年调查Q12b。",
+    "evidence": [
+      {
+        "image_id": "img_001",
+        "evidence_text": "图例中明确标注橙色曲线标签为Unfavorable，绿色曲线标签为Favorable"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "2015年横坐标上方标记数据显示Orange曲线值为54，Green曲线值为38"
+      }
+    ]
+  },
+  "meta": {
+    "language": "zh",
+    "turn_count": 6,
+    "image_count": 1,
+    "difficulty": "中等",
+    "routed_task_type": "逻辑推理",
+    "route_confidence": 0.9,
+    "route_reason": "图片为包含时间序列数据的折线图，需要分析数据趋势和关系，符合逻辑推理的定义。",
+    "source_paths": [
+      "图表推理/0001chartqa_10095.jpg"
+    ],
+    "qa_status": "auto_pass"
+  }
+}

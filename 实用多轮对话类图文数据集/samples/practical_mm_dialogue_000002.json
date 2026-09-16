@@ -31,7 +31,7 @@
     }
   ],
   "final_output": {
-    "answer": "单据头：2019-01-12 21:13；MR D.I.Y. / MR DIY TESCO TERBAU；INVOICE；姓名***（已脱敏）；应付 RM 33.90；现金50.00/找零16.10。\n\n明细：\n1. CHOPPING BOARD 35.5x25.5CM — 19.00\n2. AIR PRESSURE SPRAYER SX-575-1 1.5L — 8.02\n3. WAXCO WINDSHIELD CLEANER 120ML — 3.02\n4. BOPP TAPE 48MM*100M CLEAR — 3.88\n小计 33.92；取整 -0.02；应付 33.90。\n\n备注：蓝圈手写核对 33.90，与打印 TOTAL ROUNDED 一致。",
+    "answer": "可交付采购明细表：\n\n**单据头**\n\n| 字段 | 值 |\n| --- | --- |\n| 日期 | 2019-01-12 21:13 |\n| 商户/门店 | MR D.I.Y. / MR DIY TESCO TERBAU |\n| 单据 | INVOICE |\n| 姓名 | ***（已脱敏） |\n| 应付取整 | RM 33.90 |\n| 支付 | 现金 RM 50.00，找零 RM 16.10 |\n\n**明细**\n\n| 序号 | 商品 | 金额(RM) |\n| --- | --- | --- |\n| 1 | CHOPPING BOARD 35.5x25.5CM | 19.00 |\n| 2 | AIR PRESSURE SPRAYER SX-575-1 1.5L | 8.02 |\n| 3 | WAXCO WINDSHIELD CLEANER 120ML | 3.02 |\n| 4 | BOPP TAPE 48MM*100M CLEAR | 3.88 |\n| — | 小计 | 33.92 |\n| — | 取整 | -0.02 |\n| — | 应付 | 33.90 |\n\n**备注：** 票面 TOTAL ROUNDED 处有蓝圈，并手写核对「33.90」，与打印金额一致，可作为人工复核通过标记。",
     "output_type": "表格",
     "evidence": [
       {

@@ -1,0 +1,74 @@
+{
+  "sample_id": "practical_mm_dialogue_000009",
+  "task_type": "信息提取与整理",
+  "scenario": "工作",
+  "images": [
+    {
+      "image_id": "img_001",
+      "image_path": "images/0001slide_2012_02_20fy11roadshow_12022102244.jpg"
+    }
+  ],
+  "dialogue": [
+    {
+      "role": "user",
+      "content": "<image>请提供这张PPT截图的核心财务数据。",
+      "evidence": "全图可见2011年业绩总结表格",
+      "turn_id": 1
+    },
+    {
+      "role": "assistant",
+      "content": "已识别关键指标：销售收入836亿瑞士法郎，毛利率15%（同比提升60个基点）。是否需要特定字段优先提取？",
+      "evidence": "'Sales'行显示83.6 bn，'Trading Operating Profit Margin'行显示15.0% +60 bps",
+      "turn_id": 2
+    },
+    {
+      "role": "user",
+      "content": "请按时间维度分表展示净利润及每股收益数据。",
+      "evidence": "需对比Net Profit与Underlying EPS两栏数据",
+      "turn_id": 3
+    },
+    {
+      "role": "assistant",
+      "content": "已完成结构化：\n1. 净利润：95亿瑞郎（+8.1%）\n2. 每股盈利：3.08瑞郎（未披露同比数据）\n注：净利率11.3%较2010年提升130个基点",
+      "evidence": "'Net Profit'行9.5 bn +8.1%，'Net Profit Margin'行11.3% +130 bps，'Underlying EPS'行3.08",
+      "turn_id": 4
+    },
+    {
+      "role": "user",
+      "content": "汇率调整后的数据是否可获取？",
+      "evidence": "图表右侧存在'At constant exchange rates'列",
+      "turn_id": 5
+    },
+    {
+      "role": "assistant",
+      "content": "补充汇率调整项：毛利率+90个基点，每股盈利+7.8%。建议关注左侧原始数据基准线。",
+      "evidence": "'Trading Operating Profit Margin' +90 bps / 'Underlying EPS' +7.8%",
+      "turn_id": 6
+    }
+  ],
+  "final_output": {
+    "answer": "补充汇率调整项：毛利率+90个基点，每股盈利+7.8%。建议关注左侧原始数据基准线。",
+    "output_type": "表格",
+    "evidence": [
+      {
+        "image_id": "img_001",
+        "evidence_text": "见图 img_001 中与任务相关的可见内容"
+      }
+    ]
+  },
+  "meta": {
+    "total_images": 1,
+    "processing_time_ms": 287,
+    "confidence_score": 0.97,
+    "language": "zh",
+    "turn_count": 6,
+    "image_count": 1,
+    "difficulty": "中等",
+    "routed_task_type": "信息提取与整理",
+    "route_confidence": 0.95,
+    "route_reason": "图片为包含多项财务指标的PPT报表，核心任务是提取其中的结构化数据。",
+    "source_paths": [
+      "文档截图/0001slide_2012_02_20fy11roadshow_12022102244.jpg"
+    ]
+  }
+}

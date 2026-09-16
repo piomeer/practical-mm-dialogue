@@ -1,0 +1,92 @@
+{
+  "sample_id": "practical_mm_dialogue_000010",
+  "task_type": "信息提取与整理",
+  "scenario": "生活",
+  "images": [
+    {
+      "image_id": "img_001",
+      "image_path": "images/0003sroie_x00016469612.jpg"
+    }
+  ],
+  "dialogue": [
+    {
+      "role": "user",
+      "content": "<image>[图片]",
+      "turn_id": 1
+    },
+    {
+      "role": "assistant",
+      "content": "已提取关键信息如下：\n• 公司名称：BOOK TA .K (TAMAN DAYA) SDN BHD\n• 地址：NO:53 55,57 & 59, JALAN SAGU 18, TAMAN DAYA, 81100 JOHOR BAHRU, JOHOR\n• Document No: TD01167/104\n• 日期时间：25/12/2018 8:13:39 PM\n• 收银员：MANIS\n• 商品详情：9556939040118 KF MODELLING CLAY KIDDY FISH，单价9.00，数量1 PC\n• 合计金额：9.00 RM\n• 支付现金：10.00，找零：1.00\n请核对信息准确性。",
+      "turn_id": 2
+    },
+    {
+      "role": "user",
+      "content": "收银员姓名需要脱敏吗？另外确认下商品编码是否正确？",
+      "turn_id": 3
+    },
+    {
+      "role": "assistant",
+      "content": "根据您的要求已将收银员姓名脱敏为***。商品编码9556939040118与图中文本完全一致，位于商品名称左侧列。",
+      "turn_id": 4
+    },
+    {
+      "role": "user",
+      "content": "支付现金和找零金额是否匹配？有没有四舍五入调整？",
+      "turn_id": 5
+    },
+    {
+      "role": "assistant",
+      "content": "现金支付10.00与找零1.00匹配，Round Total显示精确金额9.00。图中明确标注'Rounding Adjustment: 0.00'",
+      "turn_id": 6
+    },
+    {
+      "role": "user",
+      "content": "最终确认所有金额无误后生成正式表格。",
+      "turn_id": 7
+    },
+    {
+      "role": "assistant",
+      "content": "| 字段 | 内容 |\n|------|------|\n| 公司名称 | BOOK TA .K (TAMAN DAYA) SDN BHD |\n| 注册编号 | 789417-W |\n| 地址 | NO:53 55,57 & 59, JALAN SAGU 18, TAMAN DAYA, 81100 JOHOR BAHRU, JOHOR |\n| 单据编号 | TD01167/104 |\n| 交易时间 | 25/12/2018 8:13:39 PM |\n| 收银员 | *** |\n| 商品信息 | 商品编码9556939040118，名称KF MODELLING CLAY KIDDY FISH |\n| 单价 | 9.00 RM |\n| 数量 | 1 PC |\n| 总计金额 | 9.00 RM |\n| 支付方式 | 现金 |\n| 实付金额 | 10.00 |\n| 找零金额 | 1.00 |\n| 备注 | GOODS SOLD ARE NOT RETURNABLE OR EXCHANGEABLE |\n",
+      "turn_id": 8
+    }
+  ],
+  "final_output": {
+    "output_type": "表格",
+    "answer": "| 字段 | 内容 |\n|------|------|\n| 公司名称 | BOOK TA .K (TAMAN DAYA) SDN BHD |\n| 注册编号 | 789417-W |\n| 地址 | NO:53 55,57 & 59, JALAN SAGU 18, TAMAN DAYA, 81100 JOHOR BAHRU, JOHOR |\n| 单据编号 | TD01167/104 |\n| 交易时间 | 25/12/2018 8:13:39 PM |\n| 收银员 | *** |\n| 商品信息 | 商品编码9556939040118，名称KF MODELLING CLAY KIDDY FISH |\n| 单价 | 9.00 RM |\n| 数量 | 1 PC |\n| 总计金额 | 9.00 RM |\n| 支付方式 | 现金 |\n| 实付金额 | 10.00 |\n| 找零金额 | 1.00 |\n| 备注 | GOODS SOLD ARE NOT RETURNABLE OR EXCHANGEABLE |",
+    "evidence": [
+      {
+        "image_id": "img_001",
+        "evidence_text": "公司名称'BOOK TA .K (TAMAN DAYA) SDN BHD'及注册编号'789417-W'位于收据顶部"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "地址'NO:53 55,57 & 59, JALAN SAGU 18, TAMAN DAYA, 81100 JOHOR BAHRU, JOHOR'与单据编号'TD01167/104'清晰可见"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "交易时间'25/12/2018 8:13:39 PM'和收银员'MANIS'（已脱敏）均明确标注"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "商品编码9556939040118、单价9.00 RM、数量1 PC与总计9.00 RM对应位置一致"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "现金支付10.00、找零1.00及'Goods sold are not returnable or exchangeable'条款均在图示中明确显示"
+      }
+    ]
+  },
+  "meta": {
+    "language": "zh",
+    "turn_count": 8,
+    "image_count": 1,
+    "difficulty": "中等",
+    "routed_task_type": "信息提取与整理",
+    "route_confidence": 0.95,
+    "route_reason": "图片是一张清晰的购物收据，核心任务是对商家、时间、商品及金额等关键字段进行结构化提取。",
+    "source_paths": [
+      "收据/0003sroie_x00016469612.jpg"
+    ],
+    "qa_status": "auto_pass"
+  }
+}

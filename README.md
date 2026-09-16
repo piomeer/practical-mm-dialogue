@@ -43,6 +43,15 @@ cp .env.example .env   # 如需 Unsplash 补充源，填入 Access Key
 
 写作对话时只从 `data/` 取未用图；写完后移入 `data_used/`。
 
+### 千问生成完整样本（路由 → 写作 → 校验 → 修复）
+
+```bash
+.venv/bin/python scripts/generate_sample_qwen.py --model qwen3.5-flash
+.venv/bin/python scripts/validate_sample.py 实用多轮对话类图文数据集/samples/practical_mm_dialogue_000005.json
+```
+
+提示词在 `prompts/qwen/`；token/耗时写入 `logs/qwen_token_usage.jsonl` 与 `logs/qwen_generate_runs.jsonl`。
+
 ## 许可注意
 
 各图片来源许可不同（SROIE、ChartQA、SlideVQA、Wikimedia、Unsplash 等），见 `data/_meta/index.jsonl` 与 `data/README.md`。二次分发前请逐条核对。

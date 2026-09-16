@@ -1,0 +1,55 @@
+{
+  "sample_id": "practical_mm_dialogue_000006",
+  "task_type": "看图创作",
+  "scenario": "生活",
+  "images": [
+    {
+      "image_id": "img_001",
+      "image_path": "images/0005a_picnic_spread_with_waffles_and_berries.jpg"
+    }
+  ],
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "role": "user",
+      "content": "<image>请为这个野餐场景写一条朋友圈文案，要求突出春日氛围。"
+    },
+    {
+      "turn_id": 2,
+      "role": "assistant",
+      "content": "「春日限定·花园野餐」\n阳光穿过白花簇拥的老树，在草地上洒下碎金。编织篮里装着刚烤好的华夫饼，草莓酱还冒着热气，旁边摆着玻璃罐里的蓝莓和薄荷叶。戴黑丝带的草帽静静躺在麻布毯边，风一吹就听见野餐篮里的餐具叮当响。"
+    },
+    {
+      "turn_id": 3,
+      "role": "user",
+      "content": "增加些互动感，加入与朋友共处的画面暗示。"
+    },
+    {
+      "turn_id": 4,
+      "role": "assistant",
+      "content": "「和春天撞个满怀」\n老树的白色花雨落在野餐垫上时，我们正用木勺碰杯打翻酸奶罐。陶土水壶旁的华夫饼被分食到只剩一半，草帽下的头发沾了花瓣。有人提议把浆果装进玻璃罐，结果蓝莓滚得到处都是——就像此刻被风吹散的欢声笑语。"
+    }
+  ],
+  "final_output": {
+    "answer": "「和春天撞个满怀」\n老树的白色花雨落在野餐垫上时，我们正用木勺碰杯打翻酸奶罐。陶土水壶旁的华夫饼被分食到只剩一半，草帽下的头发沾了花瓣。有人提议把浆果装进玻璃罐，结果蓝莓滚得到处都是——就像此刻被风吹散的欢声笑语。\n#春日限定 #野餐灵感 #慢时光",
+    "output_type": "创作文案",
+    "evidence": [
+      {
+        "image_id": "img_001",
+        "evidence_text": "图中可见：盛满蓝莓的玻璃罐、华夫饼配草莓酱、带黑丝带的草帽、编织野餐篮、木质托盘、米色麻布毯、白色小花瓶插着白花、陶瓷水壶等野餐元素，背景有开满白花的树木和黄色野花"
+      }
+    ]
+  },
+  "meta": {
+    "language": "zh",
+    "turn_count": 4,
+    "image_count": 1,
+    "difficulty": "基础",
+    "routed_task_type": "看图创作",
+    "route_confidence": 0.9,
+    "route_reason": "这是一张唯美的生活氛围图，主要包含餐具、食物和自然景观，无复杂逻辑或文本需提取，符合规则5中对于生活氛围图优先考虑看图创作的建议，契合prior。",
+    "source_paths": [
+      "生活场景/0005a_picnic_spread_with_waffles_and_berries.jpg"
+    ]
+  }
+}

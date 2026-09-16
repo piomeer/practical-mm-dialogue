@@ -1,0 +1,79 @@
+{
+  "sample_id": "practical_mm_dialogue_000008",
+  "task_type": "逻辑推理",
+  "scenario": "工作",
+  "images": [
+    {
+      "image_id": "img_001",
+      "image_path": "images/0001chartqa_10095.jpg"
+    }
+  ],
+  "dialogue": [
+    {
+      "role": "user",
+      "content": "这张图表显示了什么信息？",
+      "turn_id": 1
+    },
+    {
+      "role": "assistant",
+      "content": "根据图表<image>，该折线图展示了2005年至2015年间美国民众对华态度的正面与负面评价占比变化。绿色实线代表Favorable（有利）比例，橙色虚线代表Unfavorable（不利）比例，纵轴单位为百分比。",
+      "turn_id": 2
+    },
+    {
+      "role": "user",
+      "content": "请对比2005年和2015年的关键数据点。",
+      "turn_id": 3
+    },
+    {
+      "role": "assistant",
+      "content": "2005年有利比例为43%，不利35%；2015年有利降至38%，不利升至54%。可见有利评价下降5个百分点，不利上升19个百分点，说明负面态度显著增强。",
+      "turn_id": 4
+    },
+    {
+      "role": "user",
+      "content": "为什么会出现这样的趋势变化？",
+      "turn_id": 5
+    },
+    {
+      "role": "assistant",
+      "content": "结合数据来源（Pew Research Center 2015年调查），可能受中美关系发展、贸易摩擦等因素影响，随着时间推移，更多美国人转向负面评价。",
+      "turn_id": 6
+    },
+    {
+      "role": "user",
+      "content": "能否得出当前美国对华态度主流的结论？",
+      "turn_id": 7
+    },
+    {
+      "role": "assistant",
+      "content": "是的。2015年数据显示，54%的美国人持负面看法，远高于正面的38%。这支持图表标题“Americans Give China Mostly Negative Ratings”的结论。",
+      "turn_id": 8
+    }
+  ],
+  "final_output": {
+    "answer": "2015年数据显示，54%的美国人持负面看法，远高于正面的38%。这支持图表标题“Americans Give China Mostly Negative Ratings”的结论。",
+    "evidence": [
+      {
+        "image_id": "img_001",
+        "evidence_text": "Unfavorable: 54% (2015)"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "Favorable: 38% (2015)"
+      }
+    ],
+    "output_type": "推理结论"
+  },
+  "meta": {
+    "language": "zh",
+    "turn_count": 8,
+    "image_count": 1,
+    "difficulty": "中等",
+    "routed_task_type": "逻辑推理",
+    "route_confidence": 0.9,
+    "route_reason": "图片为典型的趋势折线图与统计表格，依据规则6图表优先逻辑推理，且数据趋势分析需依赖逻辑推导。",
+    "source_paths": [
+      "图表推理/0001chartqa_10095.jpg"
+    ]
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "sample_id": "practical_mm_dialogue_000005",
+  "task_type": "信息提取与整理",
+  "scenario": "生活",
+  "images": [
+    {
+      "image_id": "img_001",
+      "image_path": "images/0003sroie_x00016469612.jpg"
+    }
+  ],
+  "dialogue": [
+    {
+      "role": "user",
+      "content": "请从这张收据中提取关键信息，包括日期、交易金额和购买物品。<image>",
+      "turn_id": 1
+    },
+    {
+      "role": "assistant",
+      "content": "已提取信息：\n文档号：TD01167/104\n日期：2018年12月25日\n商品：KF MODELLING CLAY KIDDY FISH（数量1件，单价9.00）\n总金额：9.00",
+      "turn_id": 2
+    },
+    {
+      "role": "user",
+      "content": "请将上述信息整理为表格形式，并标注来源位置。",
+      "turn_id": 3
+    },
+    {
+      "role": "assistant",
+      "content": "整理后的表格如下：\n| 字段       | 内容                      | 来源位置          |\n|------------|---------------------------|-------------------|\n| 文档编号   | TD01167/104               | 收据中部条形码下方 |\n| 交易日期   | 25/12/2018 8:13:39 PM     | 日期字段           |\n| 商品名称   | KF MODELLING CLAY KIDDY FISH | 商品明细第一行     |\n| 商品数量   | 1 PC                       | 商品数量列         |\n| 单价       | 9.00                       | 价格列             |\n| 总金额     | 9.00                       | Round Total (RM)   |",
+      "turn_id": 4
+    },
+    {
+      "role": "user",
+      "content": "是否需要将店铺信息也纳入表格？如果有其他未提取的信息请补充。",
+      "turn_id": 5
+    },
+    {
+      "role": "assistant",
+      "content": "已补充店铺信息并完成全量整理如下：\n| 字段       | 内容                          | 来源位置          |\n|------------|-------------------------------|-------------------|\n| 店铺名称   | BOOK TA .K (TAMAN DAYA) SDN BHD | 收据顶部标题       |\n| 文档编号   | TD01167/104                   | 条形码下方         |\n| 交易日期   | 25/12/2018 8:13:39 PM         | 日期字段           |\n| 商品名称   | KF MODELLING CLAY KIDDY FISH  | 商品明细第一行     |\n| 商品数量   | 1 PC                          | 数量列             |\n| 单价       | 9.00                          | 价格列             |\n| 总金额     | 9.00                          | Round Total (RM)   |\n| 收银员     | MANIS                         | Cashier字段        |\n| 支付方式   | CASH 10.00                    | 支付栏             |\n| 找零       | CHANGE 1.00                   | Change栏           |\n注：所有金额数据均保留原始数字，无四舍五入；手写签名'9.00'为现金支付确认标记。",
+      "turn_id": 6
+    }
+  ],
+  "final_output": {
+    "answer": "| 字段       | 内容                          | 来源位置          |\n|------------|-------------------------------|-------------------|\n| 店铺名称   | BOOK TA .K (TAMAN DAYA) SDN BHD | 收据顶部标题       |\n| 文档编号   | TD01167/104                   | 条形码下方         |\n| 交易日期   | 25/12/2018 8:13:39 PM         | 日期字段           |\n| 商品名称   | KF MODELLING CLAY KIDDY FISH  | 商品明细第一行     |\n| 商品数量   | 1 PC                          | 数量列             |\n| 单价       | 9.00                          | 价格列             |\n| 总金额     | 9.00                          | Round Total (RM)   |\n| 收银员     | MANIS                         | Cashier字段        |\n| 支付方式   | CASH 10.00                    | 支付栏             |\n| 找零       | CHANGE 1.00                   | Change栏           |",
+    "output_type": "表格",
+    "evidence": [
+      {
+        "image_id": "img_001",
+        "label": "receipt_detail",
+        "evidence_text": "店铺名称: BOOK TA.K (TAMAN DAYA) SDN BHD\n文档号: TD01167/104\n日期: 25/12/2018\n商品: KF MODELLING CLAY KIDDY FISH\n总金额: 9.00"
+      }
+    ]
+  },
+  "meta": {
+    "timestamp": "2025-07-20T08:30:15Z",
+    "processing_status": "completed",
+    "evidence_locations": [
+      "顶部标题区",
+      "条形码区",
+      "日期字段区",
+      "商品明细行",
+      "金额计算区"
+    ],
+    "language": "zh",
+    "turn_count": 6,
+    "image_count": 1,
+    "difficulty": "中等",
+    "routed_task_type": "信息提取与整理",
+    "route_confidence": 0.95,
+    "route_reason": "收据类图片的核心价值在于其中包含的交易流水、金额及商户等结构化数据，首要任务是将其从图像转换为可编辑的文本信息。",
+    "source_paths": [
+      "收据/0003sroie_x00016469612.jpg"
+    ]
+  }
+}
