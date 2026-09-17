@@ -467,10 +467,11 @@ def validate_sample(data: dict, *, check_image_files: bool = False, images_root:
             f"meta.ocr_spotcheck must be object or list if present, got {type(ocr).__name__}"
         )
 
-    # Extraction: spotcheck key_numbers must land in the delivered table (answer).
-    # api_ok/verified semantics unchanged — this only catches "read but dropped".
+    # Extraction: only core_keys (header/settlement) must land in answer.
+    # key_numbers remain observed-only for human review and never hard-fail validate.
+    # Legacy samples with only key_numbers (no core_keys) do not fail on this gate.
     if task_type == "信息提取与整理" and isinstance(ocr, dict):
-        keys = ocr.get("key_numbers")
+        keys = ocr.get("core_keys")
         if isinstance(keys, list) and keys and isinstance(answer, str):
             ans_norm = _norm_ws(answer)
             missing_keys: list[str] = []
@@ -483,7 +484,7 @@ def validate_sample(data: dict, *, check_image_files: bool = False, images_root:
                 preview = ", ".join(missing_keys[:8])
                 more = f" (+{len(missing_keys) - 8} more)" if len(missing_keys) > 8 else ""
                 errs.append(
-                    "ocr_spotcheck.key_numbers missing from final_output.answer: "
+                    "ocr_spotcheck.core_keys missing from final_output.answer: "
                     f"{preview}{more}"
                 )
 

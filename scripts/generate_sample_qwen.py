@@ -521,7 +521,8 @@ def generate_one(
             json.dumps(sample, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
         run["out_path"] = str(out_path.relative_to(ROOT))
-        # Optional OCR spot-check for receipt/doc (meta only; never fails validate)
+        # OCR spot-check for receipt/doc: key_numbers = observed clue;
+        # core_keys = optional hard gate (must ⊆ answer when present).
         if cat in {"收据", "文档截图"}:
             try:
                 from ocr_spotcheck_qwen import spotcheck_one
@@ -529,11 +530,40 @@ def generate_one(
                 oc = spotcheck_one(client, model, sample)
                 if oc:
                     sample.setdefault("meta", {})["ocr_spotcheck"] = oc
+                    run["ocr_spotcheck_tokens"] = oc.get("tokens") or 0
+                    post_errs = validate_sample(sample)
+                    run["validate_after_ocr"] = post_errs
+                    if post_errs:
+                        # One optional repair for core_keys gaps; never drop the sample.
+                        repair_sys = read_prompt("repair.md")
+                        repair_user = repair_user_message(post_errs, sample, compact=False)
+                        repair_text, repair_usage = chat_vision(
+                            client,
+                            model,
+                            repair_sys,
+                            repair_user,
+                            abs_paths,
+                            "repair_ocr_core_keys",
+                            rels,
+                        )
+                        repaired = extract_json(repair_text)
+                        repaired = normalize_sample(
+                            repaired, sample_id, rels, task_type, scenario, route
+                        )
+                        # Keep the fresh spotcheck meta (normalize may drop unknown fields)
+                        repaired.setdefault("meta", {})["ocr_spotcheck"] = oc
+                        run.setdefault("repair_tokens", 0)
+                        run["repair_tokens"] += repair_usage.get("total_tokens", 0)
+                        post2 = validate_sample(repaired)
+                        run["validate_after_ocr_repair"] = post2
+                        sample = repaired
+                        if post2:
+                            run["ocr_core_keys_gap"] = True
+                            run["ocr_core_keys_errors"] = post2
                     out_path.write_text(
                         json.dumps(sample, ensure_ascii=False, indent=2) + "\n",
                         encoding="utf-8",
                     )
-                    run["ocr_spotcheck_tokens"] = oc.get("tokens") or 0
             except Exception as e:
                 run["ocr_spotcheck_error"] = str(e)
         # Mirror into pending-review queue (format_pass only, not golden)

@@ -60,7 +60,17 @@
       "checked_at": "2026-09-17T03:06:05.321184+00:00",
       "model": "qwen3.5-flash",
       "tokens": 3718,
-      "note": "api_ok only means the VL call returned JSON; verified is always false in this script"
+      "note": "api_ok only means the VL call returned JSON; verified is always false. key_numbers=observed (human clue); core_keys=settlement fields aligned to summary answer (manually set after core_keys strategy).",
+      "core_keys": [
+        "002017394688",
+        "1250016708",
+        "476.80",
+        "500.00",
+        "23.20",
+        "2018051110133130177",
+        "11/05/2018",
+        "17:19"
+      ]
     }
   },
   "dialogue": [

@@ -43,9 +43,15 @@ SYSTEM = """你是OCR抽检助手。只根据图片读出可见原文，不要�
 {
   "header_person_name": "页眉人名原文，无则空字符串",
   "merchant_legal_name": "法定店名或文档标题原文，看不清则空字符串",
-  "key_numbers": ["图中关键编号/金额/百分比等原文片段", "..."],
+  "key_numbers": ["图中见到的编号/金额/百分比等原文片段（可含行价、手写批注，供人审）", "..."],
+  "core_keys": ["单据头+结算必备原文：发票号、日期、时间、GST/客户号、应付总额(取整后)、实付、找零等"],
   "notes": "不确定处一句话，可空"
 }
+
+core_keys 规则（硬门禁用，须精简）：
+- 要：发票号、交易日期、交易时间（可分行）、GST ID、顾客号、Total After Adj / 应付总额、Cash/实付、Change/找零、文档标题级关键数字。
+- 不要：行项目单价（如 93.90SR）、手写批注号（如 A05023）、取整前小计（已有 After Adj 总额时）、把日期与时间硬拼成一条。
+- key_numbers 仍可收录全量观测值；core_keys 只放摘要交付也应覆盖的结算字段。
 不要 Markdown 代码围栏。"""
 
 
@@ -174,6 +180,15 @@ def spotcheck_one(client: OpenAI, model: str, data: dict) -> dict | None:
     parsed = extract_json(text)
     # Back-compat: old field merchant_or_title may appear; prefer merchant_legal_name
     merchant = parsed.get("merchant_legal_name") or parsed.get("merchant_or_title") or ""
+    key_numbers = parsed.get("key_numbers") or []
+    if not isinstance(key_numbers, list):
+        key_numbers = []
+    core_keys = parsed.get("core_keys") or []
+    if not isinstance(core_keys, list):
+        core_keys = []
+    # Normalize to non-empty strings only
+    key_numbers = [str(x).strip() for x in key_numbers if str(x).strip()]
+    core_keys = [str(x).strip() for x in core_keys if str(x).strip()]
     return {
         "api_ok": True,
         "verified": False,
@@ -181,12 +196,16 @@ def spotcheck_one(client: OpenAI, model: str, data: dict) -> dict | None:
         "image": _rel(img),
         "header_person_name": parsed.get("header_person_name") or "",
         "merchant_legal_name": merchant,
-        "key_numbers": parsed.get("key_numbers") or [],
+        "key_numbers": key_numbers,
+        "core_keys": core_keys,
         "notes": parsed.get("notes") or "",
         "checked_at": utc_now(),
         "model": model,
         "tokens": total_tokens,
-        "note": "api_ok only means the VL call returned JSON; verified is always false in this script",
+        "note": (
+            "api_ok only means the VL call returned JSON; verified is always false. "
+            "key_numbers=observed (human clue); core_keys=validate hard gate when present."
+        ),
     }
 
 
@@ -247,6 +266,7 @@ def main() -> int:
                 f"SPOT {path.name}: api_ok={oc.get('api_ok')} verified={oc.get('verified')} "
                 f"merchant={oc.get('merchant_legal_name')!r} "
                 f"header_person={oc.get('header_person_name')!r} "
+                f"core_keys={oc.get('core_keys')} "
                 f"keys={oc.get('key_numbers')}"
             )
     return 0

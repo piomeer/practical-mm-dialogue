@@ -24,7 +24,9 @@
 
 流程：`route → write → validate → repair → format_pass（进待审队列）→ 人审 → human_pass → mark_images_used`。
 
-金样基准目前仅为 `000001`–`000004`；`format_pass` 联调样（如 `000010`–`000014`）须人审后再晋升。
+收据/文档会附带 `meta.ocr_spotcheck`：`key_numbers` 仅人审线索；硬门禁看 `core_keys`（单据头/结算字段须出现在 `answer`）。`api_ok≠verified`。
+
+金样基准目前仅为 `000001`–`000004`；`format_pass` 联调样须人审后再晋升。
 
 ## 快速开始
 

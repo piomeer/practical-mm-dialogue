@@ -16,3 +16,4 @@
 12. 不得编造图中不存在的人物、物件或无法从图验证的因果。
 13. meta.qa_status 用 format_pass；meta.review_queue=true。
 14. 若用户只给了错误列表+片段：据此重写完整 dialogue，勿只返回片段。
+15. 若错误含 `ocr_spotcheck.core_keys missing`：只把缺失的结算/单据头字段补进末轮表格与 answer；**不要**为此强行加入全部行项目单价或手写批注号。用户只要摘要表时，明细行价非必须。
