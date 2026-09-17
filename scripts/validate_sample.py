@@ -61,6 +61,8 @@ META_KEYS = {
     "qa_status",
     "review_queue",
     "ocr_spotcheck",
+    "agent_audit",
+    "human_spot_queue",
 }
 
 # Only scene folders are hard-bound; chart/receipt folders are modality, not scenario.
@@ -72,7 +74,13 @@ CATEGORY_SCENARIO = {
     "代码报错": {"工作", "学习"},
 }
 
-ALLOWED_QA_STATUS = {"format_pass", "human_pass", "rejected", "auto_pass"}
+ALLOWED_QA_STATUS = {
+    "format_pass",
+    "agent_pass",
+    "human_pass",
+    "rejected",
+    "auto_pass",
+}
 
 # Tasks / output types that must converge on a final deliverable in the last turn
 DELIVERABLE_TASK_TYPES = {
@@ -456,11 +464,21 @@ def validate_sample(data: dict, *, check_image_files: bool = False, images_root:
     if qs is not None and qs not in ALLOWED_QA_STATUS:
         errs.append(
             f"meta.qa_status invalid: {qs!r} "
-            f"(allowed: format_pass/human_pass/rejected; auto_pass legacy-ok)"
+            f"(allowed: format_pass/agent_pass/human_pass/rejected; auto_pass legacy-ok)"
         )
     rq = meta.get("review_queue")
     if rq is not None and not isinstance(rq, bool):
         errs.append(f"meta.review_queue must be bool if present, got {type(rq).__name__}")
+    hsq = meta.get("human_spot_queue")
+    if hsq is not None and not isinstance(hsq, bool):
+        errs.append(
+            f"meta.human_spot_queue must be bool if present, got {type(hsq).__name__}"
+        )
+    aa = meta.get("agent_audit")
+    if aa is not None and not isinstance(aa, dict):
+        errs.append(
+            f"meta.agent_audit must be object if present, got {type(aa).__name__}"
+        )
     ocr = meta.get("ocr_spotcheck")
     if ocr is not None and not isinstance(ocr, (dict, list)):
         errs.append(

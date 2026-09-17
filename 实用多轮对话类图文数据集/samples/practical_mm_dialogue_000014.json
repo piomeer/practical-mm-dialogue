@@ -56,6 +56,23 @@
     "route_reason": "这是一张包含趋势数据的折线图，主要涉及数据间的对比与变化规律分析，根据规则6优先判定为逻辑推理任务。",
     "source_paths": [
       "图表推理/0001chartqa_10095.jpg"
-    ]
+    ],
+    "human_spot_queue": false,
+    "agent_audit": {
+      "verdict": "fail",
+      "task_type": "逻辑推理",
+      "reasons": [
+        "2013好感读数写成40%图为37%",
+        "本轮不晋升"
+      ],
+      "critical_checks": {
+        "draft_rollback": "n/a",
+        "ocr_fields": "n/a",
+        "chart_readings": "fail",
+        "object_grounding": "n/a"
+      },
+      "batch_file": "logs/agent_audit/010_014_fail.jsonl",
+      "applied_at": "2026-09-17T10:04:51.816771+00:00"
+    }
   }
 }

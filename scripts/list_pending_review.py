@@ -15,7 +15,7 @@ PENDING = SAMPLES / "_pending_review"
 def is_pending(data: dict) -> bool:
     meta = data.get("meta") if isinstance(data.get("meta"), dict) else {}
     qs = meta.get("qa_status")
-    if qs in {"human_pass", "rejected"}:
+    if qs in {"agent_pass", "human_pass", "rejected"}:
         return False
     if meta.get("review_queue") is True:
         return True

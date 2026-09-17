@@ -45,8 +45,8 @@
     ]
   },
   "meta": {
-    "qa_status": "format_pass",
-    "review_queue": true,
+    "qa_status": "agent_pass",
+    "review_queue": false,
     "language": "zh",
     "turn_count": 4,
     "image_count": 1,
@@ -56,6 +56,23 @@
     "route_reason": "图片为折线统计图表，展示跨国合作意愿的趋势数据，依据规则6优先判定为逻辑推理。",
     "source_paths": [
       "图表推理/0028chartqa_2429.jpg"
-    ]
+    ],
+    "human_spot_queue": false,
+    "agent_audit": {
+      "verdict": "pass",
+      "task_type": "逻辑推理",
+      "reasons": [
+        "美65/70/69德56/41/50全对",
+        "拒做图外因果合理"
+      ],
+      "critical_checks": {
+        "draft_rollback": "n/a",
+        "ocr_fields": "n/a",
+        "chart_readings": "ok",
+        "object_grounding": "n/a"
+      },
+      "batch_file": "logs/agent_audit/015_019_backlog.jsonl",
+      "applied_at": "2026-09-17T09:55:12.405342+00:00"
+    }
   }
 }

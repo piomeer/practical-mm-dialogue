@@ -23,8 +23,8 @@
     ]
   },
   "meta": {
-    "qa_status": "format_pass",
-    "review_queue": true,
+    "qa_status": "agent_pass",
+    "review_queue": false,
     "language": "zh",
     "turn_count": 4,
     "image_count": 1,
@@ -43,24 +43,41 @@
       "header_person_name": "",
       "merchant_legal_name": "AEON CO. (M) BHD (126926-H)",
       "key_numbers": [
-        "A05022",
+        "A05023",
+        "126926-H",
         "002017394688",
         "1250016708",
+        "000004921851",
         "93.90SR",
+        "93",
+        "-4.69",
+        "@89.21",
+        "000006227678",
         "169.00SR",
+        "-20.00",
+        "-7.45",
+        "@141.55",
+        "000008612854",
         "558.00SR",
+        "-299.00",
+        "-12.95",
+        "@246.05",
         "476.81",
+        "-0.01",
         "476.80",
         "500.00",
         "23.20",
         "2018051110133130177",
-        "11/05/2018 17:19"
+        "449.82",
+        "26.99",
+        "11/05/2018",
+        "17:19",
+        "1013 313 3130177",
+        "0304023",
+        "14",
+        "0",
+        "1-300-80-AEON (2366)"
       ],
-      "notes": "Top right has handwritten 'A05022'. Some handwritten notes next to item lines.",
-      "checked_at": "2026-09-17T03:06:05.321184+00:00",
-      "model": "qwen3.5-flash",
-      "tokens": 3718,
-      "note": "api_ok only means the VL call returned JSON; verified is always false. key_numbers=observed (human clue); core_keys=settlement fields aligned to summary answer (manually set after core_keys strategy).",
       "core_keys": [
         "002017394688",
         "1250016708",
@@ -70,7 +87,31 @@
         "2018051110133130177",
         "11/05/2018",
         "17:19"
-      ]
+      ],
+      "notes": "Header address indicates AEON TAMAN MALURI SC, while footer mentions AEON TEBRAU CITY; handwritten annotations '93' and Chinese characters present.",
+      "checked_at": "2026-09-17T04:20:11.945487+00:00",
+      "model": "qwen3.5-flash",
+      "tokens": 5135,
+      "note": "api_ok only means the VL call returned JSON; verified is always false. key_numbers=observed (human clue); core_keys=validate hard gate when present."
+    },
+    "human_spot_queue": false,
+    "agent_audit": {
+      "verdict": "pass",
+      "task_type": "信息提取与整理",
+      "reasons": [
+        "结算字段对拍",
+        "收银员脱敏",
+        "A05023已纠正",
+        "core_keys入表"
+      ],
+      "critical_checks": {
+        "draft_rollback": "n/a",
+        "ocr_fields": "ok",
+        "chart_readings": "n/a",
+        "object_grounding": "n/a"
+      },
+      "batch_file": "logs/agent_audit/015_019_backlog.jsonl",
+      "applied_at": "2026-09-17T09:55:12.405342+00:00"
     }
   },
   "dialogue": [

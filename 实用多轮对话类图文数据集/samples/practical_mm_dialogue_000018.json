@@ -53,8 +53,8 @@
     ]
   },
   "meta": {
-    "qa_status": "format_pass",
-    "review_queue": true,
+    "qa_status": "agent_pass",
+    "review_queue": false,
     "language": "zh",
     "turn_count": 4,
     "image_count": 1,
@@ -78,6 +78,22 @@
       "model": "qwen3.5-flash",
       "tokens": 2751,
       "note": "api_ok only means the VL call returned JSON; verified is always false in this script"
+    },
+    "human_spot_queue": false,
+    "agent_audit": {
+      "verdict": "pass",
+      "task_type": "信息提取与整理",
+      "reasons": [
+        "ENGINE PARAMETERS定义逐条对齐"
+      ],
+      "critical_checks": {
+        "draft_rollback": "n/a",
+        "ocr_fields": "ok",
+        "chart_readings": "n/a",
+        "object_grounding": "n/a"
+      },
+      "batch_file": "logs/agent_audit/015_019_backlog.jsonl",
+      "applied_at": "2026-09-17T09:55:12.405342+00:00"
     }
   }
 }

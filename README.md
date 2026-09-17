@@ -16,17 +16,21 @@
 
 ## 质量分层（硬约定）
 
-| 状态 | 含义 | 可否当金样 | 可否 `mark_images_used` |
-|------|------|------------|-------------------------|
+| 状态 | 含义 | 可否出库 / 交付 | 可否 `mark_images_used` |
+|------|------|-----------------|-------------------------|
 | `format_pass` | 仅过自动格式门禁 | 否 | 否（默认） |
-| `human_pass` | 人工确认 OCR/贴图/深度 | 可晋升 | **是** |
-| `rejected` | 人审淘汰 | 否 | 否 |
+| `agent_pass` | **Agent 对照原图主审通过** | **是**（吞吐层） | **是** |
+| `human_pass` | 人抽检/加签金样 | 是（金样子集） | 是 |
+| `rejected` | 淘汰 | 否 | 否 |
 
-流程：`route → write → validate → repair → format_pass（进待审队列）→ 人审 → human_pass → mark_images_used`。
+主流程：`route → write → validate → repair → format_pass → Agent 主审（rubric + jsonl）→ agent_pass → mark_images_used / 交付`。
 
-收据/文档会附带 `meta.ocr_spotcheck`：`key_numbers` 仅人审线索；硬门禁看 `core_keys`（单据头/结算字段须出现在 `answer`）。`api_ok≠verified`。
+人工**不**再全量逐条审核；只处理 `needs_human` 与对 `agent_pass` 的抽样（见 `list_human_spotcheck.py`）。规范：`prompts/audit/agent_audit_rubric.md`。
 
-金样基准目前仅为 `000001`–`000004`；`format_pass` 联调样须人审后再晋升。
+收据/文档会附带 `meta.ocr_spotcheck`：`key_numbers` 仅线索；硬门禁看 `core_keys`。`api_ok≠verified`。
+
+金样基准 `000001`–`000004` 仍为 `human_pass`；大批量新样以 `agent_pass` 出库即可。
+
 
 ## 快速开始
 
@@ -66,20 +70,30 @@ cp .env.example .env   # Unsplash / DASHSCOPE_API_KEY
 
 批跑结束会打印 `error_histogram_after_write` / `error_histogram_final`；token/耗时见 `logs/`。
 
-### 人审队列与归档
+### Agent 主审、人抽检与归档
 
 ```bash
+# format_pass 队列（线索列表）
 .venv/bin/python scripts/list_pending_review.py
-.venv/bin/python scripts/set_sample_qa_status.py 10 --status human_pass
+
+# Agent 按 prompts/audit/agent_audit_rubric.md 写出 jsonl 后一键晋升
+.venv/bin/python scripts/apply_agent_audit.py logs/agent_audit/<batch>.jsonl
+
+# 人抽检：全部 needs_human + 约 10% agent_pass
+.venv/bin/python scripts/list_human_spotcheck.py --sample-rate 0.1
+
+# 可选：抽检确认后加签金样
+.venv/bin/python scripts/set_sample_qa_status.py 16 --status human_pass
 
 .venv/bin/python scripts/validate_data_meta.py
-# 默认只归档 human_pass 样本配图
+# 默认归档 agent_pass 与 human_pass 样本配图
 .venv/bin/python scripts/mark_images_used.py --from-samples
 # 紧急覆盖（不推荐）：
 # .venv/bin/python scripts/mark_images_used.py --from-samples --allow-format-pass
 ```
 
-写作对话时只从 `data/` 取未用图；**人审通过后再**移入 `data_used/`。
+写作对话时只从 `data/` 取未用图；**Agent 主审（或人加签）通过后再**移入 `data_used/`。
+
 
 ## 许可注意
 

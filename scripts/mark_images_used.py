@@ -62,7 +62,11 @@ def resolve_rel_path(path_arg: str) -> str | None:
     return None
 
 
-def paths_from_samples(*, require_human_pass: bool = True) -> list[str]:
+# Default archive gate: Agent 主审或人加签均可出库
+MARKABLE_QA = {"agent_pass", "human_pass"}
+
+
+def paths_from_samples(*, require_markable: bool = True) -> list[str]:
     found: list[str] = []
     if not SAMPLES_DIR.is_dir():
         print(f"samples dir missing: {SAMPLES_DIR}", file=sys.stderr)
@@ -71,10 +75,10 @@ def paths_from_samples(*, require_human_pass: bool = True) -> list[str]:
         data = json.loads(jp.read_text(encoding="utf-8"))
         meta = data.get("meta") if isinstance(data.get("meta"), dict) else {}
         qs = meta.get("qa_status")
-        if require_human_pass and qs != "human_pass":
+        if require_markable and qs not in MARKABLE_QA:
             print(
-                f"skip {jp.name}: qa_status={qs!r} (need human_pass; "
-                f"use --allow-format-pass to override)",
+                f"skip {jp.name}: qa_status={qs!r} "
+                f"(need agent_pass/human_pass; use --allow-format-pass to override)",
                 file=sys.stderr,
             )
             continue
@@ -149,14 +153,14 @@ def main() -> int:
     parser.add_argument(
         "--allow-format-pass",
         action="store_true",
-        help="允许归档尚未 human_pass 的样本配图（默认仅 human_pass）",
+        help="允许归档尚未 agent_pass/human_pass 的样本配图（默认需已主审通过）",
     )
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
     rels: list[str] = []
     if args.from_samples:
-        rels.extend(paths_from_samples(require_human_pass=not args.allow_format_pass))
+        rels.extend(paths_from_samples(require_markable=not args.allow_format_pass))
     for p in args.paths:
         rel = resolve_rel_path(p)
         if not rel:
@@ -167,8 +171,8 @@ def main() -> int:
     if not rels:
         if args.from_samples and not args.paths:
             print(
-                "没有可归档路径：--from-samples 未找到 human_pass 样本"
-                "（先人审 set_sample_qa_status，或加 --allow-format-pass）",
+                "没有可归档路径：--from-samples 未找到 agent_pass/human_pass 样本"
+                "（先 Agent 主审 apply_agent_audit，或加 --allow-format-pass）",
                 file=sys.stderr,
             )
         else:
