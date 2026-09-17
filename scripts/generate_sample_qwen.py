@@ -158,16 +158,25 @@ def chat_vision(
 
 
 def ensure_image_markers(sample: dict) -> dict:
-    """Move all <image> markers onto user turns only; count == len(images)."""
+    """Normalize image markers onto user turns only; count == len(images)."""
     images = sample.get("images") or []
     dialogue = sample.get("dialogue") or []
     if not images or not dialogue:
         return sample
     need = len(images)
-    # Always strip from every turn first (including assistant)
+
+    def _clean_markers(text: str) -> str:
+        if not isinstance(text, str):
+            return ""
+        # Strip malformed tags models invent
+        text = re.sub(r"</?image>", "", text, flags=re.IGNORECASE)
+        text = re.sub(r"<image>\s*img_\d+\s*</image>", "", text, flags=re.IGNORECASE)
+        text = re.sub(r"(?<![A-Za-z0-9_])img_\d{3}(?![A-Za-z0-9_])", "", text)
+        return text
+
     for t in dialogue:
         if isinstance(t, dict) and isinstance(t.get("content"), str):
-            t["content"] = t["content"].replace("<image>", "")
+            t["content"] = _clean_markers(t["content"])
     user_turns = [t for t in dialogue if isinstance(t, dict) and t.get("role") == "user"]
     for i, t in enumerate(user_turns):
         if i >= need:
@@ -179,12 +188,21 @@ def ensure_image_markers(sample: dict) -> dict:
         user_turns[0]["content"] = ("<image>" * extra) + (user_turns[0].get("content") or "")
     elif not user_turns and dialogue:
         dialogue[0]["role"] = "user"
-        dialogue[0]["content"] = ("<image>" * need) + str(dialogue[0].get("content") or "")
+        dialogue[0]["content"] = ("<image>" * need) + _clean_markers(
+            str(dialogue[0].get("content") or "")
+        )
     return sample
 
 
 def sync_final_answer(sample: dict) -> dict:
-    """If answer empty or not ⊆ last assistant, set answer to last assistant content."""
+    """Keep answer ⊆ last assistant.
+
+    - If answer empty or has extras not in last assistant → set answer to last assistant
+      (forces deliverable into answer when last turn is the delivery).
+    - If answer is a short subset of last assistant, do NOT shrink/expand; leave for
+      validator (blocks 000011-style 'explanation as answer' when last turn is short,
+      and blocks early-draft answer when last turn is the full delivery).
+    """
     dialogue = sample.get("dialogue") or []
     fo = sample.get("final_output")
     if not isinstance(fo, dict):
@@ -202,7 +220,6 @@ def sync_final_answer(sample: dict) -> dict:
         return sample
     a = re.sub(r"\s+", "", answer.strip())
     b = re.sub(r"\s+", "", last_assistant.strip())
-    # Only allow answer ⊆ last assistant; if answer has extras, shrink to last assistant
     if a not in b:
         fo["answer"] = last_assistant
     return sample
@@ -311,8 +328,90 @@ def normalize_sample(
     meta["source_paths"] = rels
     # format_pass = passed automatable format gates only; not human QA
     meta["qa_status"] = "format_pass"
+    meta["review_queue"] = True
     sample["meta"] = meta
     return sample
+
+
+def repair_user_message(errs: list[str], sample: dict, *, compact: bool) -> str:
+    """Build repair prompt; first round uses fragments to cut prompt tokens."""
+    header = "校验错误列表：\n" + "\n".join(f"- {e}" for e in errs)
+    if compact:
+        dialogue = sample.get("dialogue") if isinstance(sample.get("dialogue"), list) else []
+        first_user = dialogue[0] if dialogue else None
+        last_assistant = None
+        last_user = None
+        for turn in reversed(dialogue):
+            if not isinstance(turn, dict):
+                continue
+            if turn.get("role") == "assistant" and last_assistant is None:
+                last_assistant = turn
+            elif turn.get("role") == "user" and last_assistant is not None and last_user is None:
+                last_user = turn
+                break
+        frag = {
+            "sample_id": sample.get("sample_id"),
+            "task_type": sample.get("task_type"),
+            "scenario": sample.get("scenario"),
+            "images": sample.get("images"),
+            "first_user": first_user,
+            "last_user": last_user,
+            "last_assistant": last_assistant,
+            "final_output": sample.get("final_output"),
+            "turn_count_hint": len(dialogue),
+        }
+        return (
+            header
+            + "\n\n当前样本关键片段（非完整 JSON）：\n"
+            + json.dumps(frag, ensure_ascii=False)
+            + "\n\n请输出修复后的**完整**样本 JSON（含全部 dialogue 轮次）。"
+        )
+    return (
+        header
+        + "\n\n当前 JSON：\n"
+        + json.dumps(sample, ensure_ascii=False)
+        + "\n\n请输出修复后的完整 JSON。"
+    )
+
+
+def err_bucket(msg: str) -> str:
+    m = msg or ""
+    rules = [
+        ("first_user_intent", "first user turn must state"),
+        ("lazy_table", "looks incomplete"),
+        ("table_rows", "at least 1 data row"),
+        ("output_type_map", "not allowed for task_type"),
+        ("action_plan_steps", "行动计划 but answer has no"),
+        ("answer_subset", "must be contained in the last assistant"),
+        ("assistant_image", "<image> must only appear"),
+        ("placeholder_evidence", "looks like placeholder"),
+        ("scenario_mismatch", "mismatches source category"),
+        ("unexpected_field", "unexpected field"),
+    ]
+    for name, needle in rules:
+        if needle in m:
+            return name
+    return (m[:72] + "…") if len(m) > 72 else (m or "empty")
+
+
+def load_batch_jobs(path: Path) -> list[dict]:
+    """Load jsonl jobs: each line {\"paths\": [...], \"sample_id\"?: \"...\"}."""
+    jobs: list[dict] = []
+    for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        row = json.loads(line)
+        paths = row.get("paths")
+        if not isinstance(paths, list) or not paths or not all(isinstance(p, str) for p in paths):
+            raise ValueError(f"{path}:{i} needs non-empty paths: string[]")
+        sid = row.get("sample_id")
+        if sid is not None and not isinstance(sid, str):
+            raise ValueError(f"{path}:{i} sample_id must be string if present")
+        jobs.append({"paths": list(paths), "sample_id": sid})
+    if not jobs:
+        raise ValueError(f"no jobs in {path}")
+    return jobs
 
 
 def copy_images_to_samples(rels: list[str], samples_dir: Path) -> None:
@@ -396,13 +495,9 @@ def generate_one(
     while errs and repairs < max_repair:
         repairs += 1
         repair_sys = read_prompt("repair.md")
-        repair_user = (
-            f"校验错误列表：\n"
-            + "\n".join(f"- {e}" for e in errs)
-            + "\n\n当前 JSON：\n"
-            + json.dumps(sample, ensure_ascii=False)
-            + "\n\n请输出修复后的完整 JSON。"
-        )
+        # First repair: compact fragment payload to cut prompt tokens
+        compact = repairs == 1
+        repair_user = repair_user_message(errs, sample, compact=compact)
         repair_text, repair_usage = chat_vision(
             client, model, repair_sys, repair_user, abs_paths, f"repair_{repairs}", rels
         )
@@ -410,6 +505,7 @@ def generate_one(
         sample = normalize_sample(sample, sample_id, rels, task_type, scenario, route)
         run.setdefault("repair_tokens", 0)
         run["repair_tokens"] += repair_usage.get("total_tokens", 0)
+        run[f"repair_{repairs}_compact"] = compact
         errs = validate_sample(sample)
         run[f"validate_after_repair_{repairs}"] = errs
 
@@ -425,6 +521,27 @@ def generate_one(
             json.dumps(sample, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
         run["out_path"] = str(out_path.relative_to(ROOT))
+        # Optional OCR spot-check for receipt/doc (meta only; never fails validate)
+        if cat in {"收据", "文档截图"}:
+            try:
+                from ocr_spotcheck_qwen import spotcheck_one
+
+                oc = spotcheck_one(client, model, sample)
+                if oc:
+                    sample.setdefault("meta", {})["ocr_spotcheck"] = oc
+                    out_path.write_text(
+                        json.dumps(sample, ensure_ascii=False, indent=2) + "\n",
+                        encoding="utf-8",
+                    )
+                    run["ocr_spotcheck_tokens"] = oc.get("tokens") or 0
+            except Exception as e:
+                run["ocr_spotcheck_error"] = str(e)
+        # Mirror into pending-review queue (format_pass only, not golden)
+        pending_dir = SAMPLES_OUT / "_pending_review"
+        pending_dir.mkdir(parents=True, exist_ok=True)
+        pending_path = pending_dir / f"{sample_id}.json"
+        shutil.copy2(out_path, pending_path)
+        run["pending_review_path"] = str(pending_path.relative_to(ROOT))
     else:
         fail_dir = LOG_DIR / "failed_samples"
         fail_dir.mkdir(parents=True, exist_ok=True)
@@ -443,8 +560,14 @@ def generate_one(
 def main() -> int:
     parser = argparse.ArgumentParser(description="Qwen route→write→validate→repair")
     parser.add_argument("--model", default=DEFAULT_MODEL)
-    parser.add_argument("--paths", nargs="*", default=DEFAULT_IMAGES)
-    parser.add_argument("--max-repair", type=int, default=2)
+    parser.add_argument("--paths", nargs="*", default=None, help="image rel paths under data/")
+    parser.add_argument(
+        "--batch-from-list",
+        type=Path,
+        default=None,
+        help="jsonl: each line {\"paths\":[...], \"sample_id\"?: \"practical_mm_dialogue_XXXXXX\"}",
+    )
+    parser.add_argument("--max-repair", type=int, default=3)
     parser.add_argument(
         "--start-id",
         type=int,
@@ -469,16 +592,23 @@ def main() -> int:
     SAMPLES_OUT.mkdir(parents=True, exist_ok=True)
     LOG_DIR.mkdir(parents=True, exist_ok=True)
 
-    if args.group_as_one:
-        jobs = [list(args.paths)]
+    # Build jobs: list of {paths, sample_id?}
+    if args.batch_from_list is not None:
+        jobs = load_batch_jobs(args.batch_from_list)
     else:
-        jobs = [[p] for p in args.paths]
+        paths = args.paths if args.paths is not None else list(DEFAULT_IMAGES)
+        if args.group_as_one:
+            jobs = [{"paths": list(paths), "sample_id": None}]
+        else:
+            jobs = [{"paths": [p], "sample_id": None} for p in paths]
 
     wall0 = time.perf_counter()
     ok_n = fail_n = 0
     token_sum = 0
     route_tok = write_tok = repair_tok = 0
-    # Reserve IDs even when a job fails (failed JSON goes to logs/, not samples/)
+    write_err_hist: dict[str, int] = {}
+    final_err_hist: dict[str, int] = {}
+
     if args.start_id is not None:
         if args.start_id < 1:
             print("--start-id must be >= 1", file=sys.stderr)
@@ -488,13 +618,17 @@ def main() -> int:
         next_n = int(next_sample_id(SAMPLES_OUT).rsplit("_", 1)[-1])
 
     for job in jobs:
-        sid = f"practical_mm_dialogue_{next_n:06d}"
-        next_n += 1
-        print(f"=== {sid}  paths={job} ===", flush=True)
+        job_paths = job["paths"]
+        if job.get("sample_id"):
+            sid = job["sample_id"]
+        else:
+            sid = f"practical_mm_dialogue_{next_n:06d}"
+            next_n += 1
+        print(f"=== {sid}  paths={job_paths} ===", flush=True)
         job0 = time.perf_counter()
         try:
             sample, run = generate_one(
-                client, args.model, job, sid, args.max_repair, priors
+                client, args.model, job_paths, sid, args.max_repair, priors
             )
         except Exception as e:
             fail_n += 1
@@ -503,7 +637,7 @@ def main() -> int:
                 GEN_LOG,
                 {
                     "sample_id": sid,
-                    "local_paths": job,
+                    "local_paths": job_paths,
                     "ok": False,
                     "error": str(e),
                     "ended_at": utc_now(),
@@ -526,6 +660,13 @@ def main() -> int:
                 write_tok += v
             else:
                 repair_tok += v
+
+        for e in run.get("validate_after_write") or []:
+            b = err_bucket(e)
+            write_err_hist[b] = write_err_hist.get(b, 0) + 1
+        for e in run.get("final_errors") or []:
+            b = err_bucket(e)
+            final_err_hist[b] = final_err_hist.get(b, 0) + 1
 
         if run.get("ok"):
             ok_n += 1
@@ -554,6 +695,14 @@ def main() -> int:
         f"(route={route_tok} write={write_tok} repair={repair_tok})"
     )
     print(f"wall_elapsed_ms={wall_ms} (~{wall_ms / 1000:.1f}s)")
+    if write_err_hist:
+        print("error_histogram_after_write (bucket=count):")
+        for k, v in sorted(write_err_hist.items(), key=lambda x: (-x[1], x[0])):
+            print(f"  {k}={v}")
+    if final_err_hist:
+        print("error_histogram_final (bucket=count):")
+        for k, v in sorted(final_err_hist.items(), key=lambda x: (-x[1], x[0])):
+            print(f"  {k}={v}")
     print(f"usage_log={USAGE_PATH}")
     print(f"run_log={GEN_LOG}")
     return 0 if fail_n == 0 else 1

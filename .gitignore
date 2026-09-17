@@ -5,6 +5,8 @@
 __pycache__/
 *.zip
 logs/
+tmp/
+deliveries/
 
 # Bulk image pools stay local (not pushed to GitHub)
 data/**/*.jpg
@@ -15,11 +17,22 @@ data_used/**/*.jpg
 data_used/**/*.jpeg
 data_used/**/*.png
 data_used/**/*.webp
+data_lt720/**/*.jpg
+data_lt720/**/*.jpeg
+data_lt720/**/*.png
+data_lt720/**/*.webp
 
 # Keep folder scaffolding and docs
 !data/**/.gitkeep
 !data_used/**/.gitkeep
+!data_lt720/**/.gitkeep
 !data/README.md
 !data_used/README.md
+!data_lt720/README.md
 !data/_meta/
 !data/_meta/**
+
+# Pending-review mirrors / queue lists (generated; keep README only)
+实用多轮对话类图文数据集/samples/_pending_review/*.json
+实用多轮对话类图文数据集/samples/_pending_review/*.jsonl
+!实用多轮对话类图文数据集/samples/_pending_review/README.md

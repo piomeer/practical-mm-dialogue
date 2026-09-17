@@ -8,83 +8,88 @@
       "image_path": "images/0003sroie_x00016469612.jpg"
     }
   ],
-  "dialogue": [
-    {
-      "role": "user",
-      "content": "<image>请提取这张收据的关键信息：商家名称、单据编号、交易日期时间、商品明细（名称/数量/单价）、总金额、实收与找零，需严格按原文呈现。",
-      "turn_id": 1
-    },
-    {
-      "role": "assistant",
-      "content": "**初步提取结果**\n1. 商家：BOOK TA.K (TAMAN DAYA) SDN BHD\n2. 单据号：TD01167104\n3. 日期时间：25/12/2018 8:13:39 PM\n4. 商品：KF MODELLING CLAY KIDDY FISH ×1 @RM9.00\n5. 总计：RM9.00\n6. 支付：现金RM10.00 → 找零RM1.00\n**注**：店员姓名'MANIS'需脱敏处理。",
-      "turn_id": 2
-    },
-    {
-      "role": "user",
-      "content": "请将表格扩展为字段维度拆解，确认金额数字无手写涂改风险（如圈出的9.00）。",
-      "turn_id": 3
-    },
-    {
-      "role": "assistant",
-      "content": "**修正后结构化表格**\n| 字段          | 提取内容                | 证据位置                  |\n|---------------|-------------------------|---------------------------|\n| 商家全称       | BOOK TA.K (TAMAN DAYA) SDN BHD | 顶部居中加粗标题         |\n| 单据编号       | TD01167104              | Document No:右侧         |\n| 交易时间戳     | 25/12/2018 8:13:39 PM   | Date字段后               |\n| 商品编码       | 9556939040118           | CODE列首位               |\n| 商品名称       | KF MODELLING CLAY KIDDY FISH | DESC列                 |\n| 交易数量       | 1 PC                    | QTY列                    |\n| 单价(本币)     | RM 9.00                 | PRICE列                  |\n| 折扣金额       | 0.00 RM                 | Disc列                   |\n| 应付总额       | RM 9.00                 | Total行最右              |\n| 应收现金       | RM 10.00                | Cash行右侧               |\n| 系统找零       | RM 1.00                 | CHANGE行右侧             |\n| 备注标识       | GOODS SOLD NOT RETURNABLE | 底部英文说明            |",
-      "turn_id": 4
-    },
-    {
-      "role": "user",
-      "content": "最终确认：圈出红色手写的9.00是否影响总额有效性？金额大小写核对。",
-      "turn_id": 5
-    },
-    {
-      "role": "assistant",
-      "content": "**验证结论**\n1. 圆形手写字迹（RM9.00）位于支付区块，不影响打印总额（同为RM9.00）\n2. 大写数字未出现，但电子打印格式符合马来西亚零售规范\n3. 小数点后两位精度统一，无四舍五入争议\n4. 完整交付表如下：\n| 字段 | 提取内容 | 证据位置 |\n| --- | --- | --- |\n| 商家全称 | BOOK TA.K (TAMAN DAYA) SDN BHD | 顶部标题 |\n| 单据编号 | TD01167104 | Document No:右侧 |\n| 交易时间 | 25/12/2018 8:13:39 PM | Date 字段后 |\n| 商品名称 | KF MODELLING CLAY KIDDY FISH | DESC 列 |\n| 数量 | 1 PC | QTY 列 |\n| 单价 | RM 9.00 | PRICE 列 |\n| 总计金额 | RM 9.00 | Total 行最右 |\n| 现金支付 | RM 10.00 | Cash 行右侧 |\n| 找零金额 | RM 1.00 | CHANGE 行右侧 |",
-      "turn_id": 6
-    }
-  ],
   "final_output": {
     "output_type": "表格",
-    "answer": "**验证结论**\n1. 圆形手写字迹（RM9.00）位于支付区块，不影响打印总额（同为RM9.00）\n2. 大写数字未出现，但电子打印格式符合马来西亚零售规范\n3. 小数点后两位精度统一，无四舍五入争议\n4. 完整交付表如下：\n| 字段 | 提取内容 | 证据位置 |\n| --- | --- | --- |\n| 商家全称 | BOOK TA.K (TAMAN DAYA) SDN BHD | 顶部标题 |\n| 单据编号 | TD01167104 | Document No:右侧 |\n| 交易时间 | 25/12/2018 8:13:39 PM | Date 字段后 |\n| 商品名称 | KF MODELLING CLAY KIDDY FISH | DESC 列 |\n| 数量 | 1 PC | QTY 列 |\n| 单价 | RM 9.00 | PRICE 列 |\n| 总计金额 | RM 9.00 | Total 行最右 |\n| 现金支付 | RM 10.00 | Cash 行右侧 |\n| 找零金额 | RM 1.00 | CHANGE 行右侧 |",
+    "answer": "| 字段项 | 原文记录 |\n|--------|----------|\n| 店铺名称 | BOOK TA .K (TAMAN DAYA) SDN BHD |\n| 注册编号 | 789417-W |\n| 地址 | NO.55,55,57 & 59,JALAN SAGU 18,TAMAN DAYA,81100 JOHOR BAHRU,JOHOR |\n| 单据号 | TD0116/104 |\n| 交易日期 | 25/12/2018 8:13:39 PM |\n| 商品编码 | 9556939040118 |\n| 商品描述 | KF MODELLING CLAY KIDDY FISH |\n| 数量 | 1 PC |\n| 单价(RM) | 9.00 |\n| 折扣(RM) | 0.00 |\n| 金额(RM) | 9.00 |\n| 现金支付(RM) | 10.00 |\n| 找零(RM) | 1.00 |\n| 总计(RM) | 9.00 |",
     "evidence": [
       {
         "image_id": "img_001",
-        "evidence_text": "顶部标题显示商家名称BOOK TA.K (TAMAN DAYA) SDN BHD"
+        "evidence_text": "店铺名称显示为BOOK TA .K (TAMAN DAYA) SDN BHD，注册编号789417-W位于公司名称下方"
       },
       {
         "image_id": "img_001",
-        "evidence_text": "Document No:后显示TD01167104"
+        "evidence_text": "地址NO.55,55,57 & 59,JALAN SAGU 18,TAMAN DAYA,81100 JOHOR BAHRU,JOHOR在条形码上方清晰可辨"
       },
       {
         "image_id": "img_001",
-        "evidence_text": "Date字段后记录交易时间为25/12/2018 8:13:39 PM"
+        "evidence_text": "单据号TD0116/104标注在Document No后，交易日期25/12/2018 8:13:39 PM紧随其后"
       },
       {
         "image_id": "img_001",
-        "evidence_text": "CODE列首位显示商品编码9556939040118"
-      },
-      {
-        "image_id": "img_001",
-        "evidence_text": "DESC列显示商品名称KF MODELLING CLAY KIDDY FISH"
-      },
-      {
-        "image_id": "img_001",
-        "evidence_text": "Total行最右显示应付总额RM9.00"
-      },
-      {
-        "image_id": "img_001",
-        "evidence_text": "Cash行右侧显示实收现金RM10.00，CHANGE行右侧显示找零RM1.00"
+        "evidence_text": "商品编码9556939040118左侧显示，右侧KF MODELLING CLAY KIDDY FISH为商品描述，数量1 PC，单价9.00 RM，最终总金额为9.00 RM"
       }
     ]
   },
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "role": "user",
+      "content": "<image>请从这张收据中提取店铺名称、注册编号、地址、单据号、交易日期、商品明细及金额信息。"
+    },
+    {
+      "turn_id": 2,
+      "role": "assistant",
+      "content": "收到，我已识别到收据上的关键数据。其中包括店铺名 BOOK TA .K (TAMAN DAYA) SDN BHD，交易日期 25/12/2018，以及商品 KF MODELLING CLAY KIDDY FISH。请问是否需要我将这些信息整理成标准的表格格式作为最终交付物？"
+    },
+    {
+      "turn_id": 3,
+      "role": "user",
+      "content": "是的，请将这些信息整理成完整的表格作为最终交付物输出。"
+    },
+    {
+      "turn_id": 4,
+      "role": "assistant",
+      "content": "以下是根据您要求整理的完整表格交付内容：\n\n| 字段项 | 原文记录 |\n|--------|----------|\n| 店铺名称 | BOOK TA .K (TAMAN DAYA) SDN BHD |\n| 注册编号 | 789417-W |\n| 地址 | NO.55,55,57 & 59,JALAN SAGU 18,TAMAN DAYA,81100 JOHOR BAHRU,JOHOR |\n| 单据号 | TD0116/104 |\n| 交易日期 | 25/12/2018 8:13:39 PM |\n| 商品编码 | 9556939040118 |\n| 商品描述 | KF MODELLING CLAY KIDDY FISH |\n| 数量 | 1 PC |\n| 单价(RM) | 9.00 |\n| 折扣(RM) | 0.00 |\n| 金额(RM) | 9.00 |\n| 现金支付(RM) | 10.00 |\n| 找零(RM) | 1.00 |\n| 总计(RM) | 9.00 |"
+    }
+  ],
   "meta": {
+    "qa_status": "format_pass",
+    "review_queue": true,
     "language": "zh",
-    "turn_count": 6,
+    "turn_count": 4,
     "image_count": 1,
     "difficulty": "中等",
     "routed_task_type": "信息提取与整理",
     "route_confidence": 0.95,
-    "route_reason": "图片为零售购物收据，目录已明确标注，此类图片最典型的处理需求是从票据中提取金额、日期、商品等关键信息用于生活记账或报销。",
+    "route_reason": "图片为标准商业收据，核心任务是识别并结构化输出其中的时间、商户、商品及金额等关键信息，符合信息提取特征。",
     "source_paths": [
       "收据/0003sroie_x00016469612.jpg"
     ],
-    "qa_status": "format_pass"
+    "ocr_spotcheck": {
+      "api_ok": true,
+      "verified": false,
+      "category": "收据",
+      "image": "data/收据/0003sroie_x00016469612.jpg",
+      "header_person_name": "tan woon yann",
+      "merchant_legal_name": "BOOK TA.K (TAMAN DAYA) SDN BHD",
+      "key_numbers": [
+        "TD01167/104",
+        "25/12/2018 8:13:39 PM",
+        "MANIS",
+        "9.00",
+        "0.00",
+        "9.00",
+        "9.00",
+        "0.00",
+        "9.00",
+        "10.00",
+        "1.00"
+      ],
+      "notes": "Address line contains 'NO.53 55,57 & 59'; handwritten '9.00' circled at bottom right.",
+      "checked_at": "2026-09-17T02:21:41.032883+00:00",
+      "model": "qwen3.5-flash",
+      "tokens": 1617,
+      "note": "api_ok only means the VL call returned JSON; verified is always false in this script"
+    }
   }
 }

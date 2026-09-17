@@ -1,0 +1,88 @@
+{
+  "sample_id": "practical_mm_dialogue_000017",
+  "task_type": "信息提取与整理",
+  "scenario": "生活",
+  "images": [
+    {
+      "image_id": "img_001",
+      "image_path": "images/0430sroie_x51006913019.jpg"
+    }
+  ],
+  "final_output": {
+    "output_type": "表格",
+    "answer": "| 商户信息 | 详情 |\n| :--- | :--- |\n| 商户名称 | AEON CO. (M) BHD (126926-H) |\n| 门店地址 | 3RD FLR, AEON TAMAN MALURI SC, JLN JEJAKA, TAMAN MALURI, CHERAS, 55100 KUALA LUMPUR |\n| GST ID | 002017394688 |\n| 交易日期 | 11/05/2018 |\n| 交易时间 | 17:19 |\n| 发票号码 | 2018051110133130177 |\n| 顾客编号 | 1250016708 |\n| 收银员 | *** |\n| 商品项数 | 3 |\n| 总金额 (含税) | 476.80 |\n| 支付方式 | CASH 500.00 |\n| 找零 | 23.20 |\n| 积分数 | 14 |\n",
+    "evidence": [
+      {
+        "image_id": "img_001",
+        "evidence_text": "图片顶部明确印制的商户全称'AEON CO. (M) BHD (126926-H)'"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "图片底部的'Total After Adj Incl GST'行明确显示数值'476.80'"
+      }
+    ]
+  },
+  "meta": {
+    "qa_status": "format_pass",
+    "review_queue": true,
+    "language": "zh",
+    "turn_count": 4,
+    "image_count": 1,
+    "difficulty": "中等",
+    "routed_task_type": "信息提取与整理",
+    "route_confidence": 0.95,
+    "route_reason": "图片为包含商品明细与金额的收据，最常见需求是将结构化信息提取以便记账或核对。",
+    "source_paths": [
+      "收据/0430sroie_x51006913019.jpg"
+    ],
+    "ocr_spotcheck": {
+      "api_ok": true,
+      "verified": false,
+      "category": "收据",
+      "image": "data/收据/0430sroie_x51006913019.jpg",
+      "header_person_name": "",
+      "merchant_legal_name": "AEON CO. (M) BHD (126926-H)",
+      "key_numbers": [
+        "A05022",
+        "002017394688",
+        "1250016708",
+        "93.90SR",
+        "169.00SR",
+        "558.00SR",
+        "476.81",
+        "476.80",
+        "500.00",
+        "23.20",
+        "2018051110133130177",
+        "11/05/2018 17:19"
+      ],
+      "notes": "Top right has handwritten 'A05022'. Some handwritten notes next to item lines.",
+      "checked_at": "2026-09-17T03:06:05.321184+00:00",
+      "model": "qwen3.5-flash",
+      "tokens": 3718,
+      "note": "api_ok only means the VL call returned JSON; verified is always false in this script"
+    }
+  },
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "role": "user",
+      "content": "<image>你好，请帮我从这张 AEON 购物小票上提取关键的商户信息和交易金额，并以表格形式输出。"
+    },
+    {
+      "turn_id": 2,
+      "role": "assistant",
+      "content": "好的，我已经接收到了您的图片。我会仔细提取小票上的信息。请您确认是否还需要其他特定字段，例如商品清单详情？"
+    },
+    {
+      "turn_id": 3,
+      "role": "user",
+      "content": "直接列出主要的账户、支付和总额信息即可，我需要最终的定稿表格。"
+    },
+    {
+      "turn_id": 4,
+      "role": "assistant",
+      "content": "| 商户信息 | 详情 |\n| :--- | :--- |\n| 商户名称 | AEON CO. (M) BHD (126926-H) |\n| 门店地址 | 3RD FLR, AEON TAMAN MALURI SC, JLN JEJAKA, TAMAN MALURI, CHERAS, 55100 KUALA LUMPUR |\n| GST ID | 002017394688 |\n| 交易日期 | 11/05/2018 |\n| 交易时间 | 17:19 |\n| 发票号码 | 2018051110133130177 |\n| 顾客编号 | 1250016708 |\n| 收银员 | *** |\n| 商品项数 | 3 |\n| 总金额 (含税) | 476.80 |\n| 支付方式 | CASH 500.00 |\n| 找零 | 23.20 |\n| 积分数 | 14 |\n"
+    }
+  ]
+}

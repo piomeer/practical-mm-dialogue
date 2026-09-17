@@ -1,0 +1,87 @@
+{
+  "sample_id": "practical_mm_dialogue_000015",
+  "task_type": "看图创作",
+  "scenario": "生活",
+  "images": [
+    {
+      "image_id": "img_001",
+      "image_path": "images/0026a_cobblestone_street_with_outdoor_cafe_t.jpg"
+    }
+  ],
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "role": "user",
+      "content": "<image>请为这张鹅卵石街道咖啡馆照片写小红书文案，突出氛围和咖啡选择，带emoji"
+    },
+    {
+      "turn_id": 2,
+      "role": "assistant",
+      "content": "🏡【石板路与咖啡香的相遇】\n穿过拱廊的瞬间被暖黄灯光拥住\n街角的椅子透着复古的味道\nCOFFEE SHOP的黑色菜单板写着\n\"今天该选美式还是拿铁？\"\n风铃摇晃时突然想起\n原来城市最好的BGM是咖啡机蒸汽声\n#街角秘境 #咖啡馆日常"
+    },
+    {
+      "turn_id": 3,
+      "role": "user",
+      "content": "感觉描写还可以更细腻一点，比如把周围的环境细节也带上"
+    },
+    {
+      "turn_id": 4,
+      "role": "assistant",
+      "content": "🏡【石板路与咖啡香的相遇】\n穿过拱廊的瞬间被暖黄灯光拥住\n玻璃窗外透出的绿意让人放松\nCOFFEE SHOP的黑色菜单板写着\n\"今天该选美式还是拿铁？\"\n石缝间钻出的野花与蓝色花盆相映成趣\n风铃摇晃时突然想起\n原来城市最好的BGM是咖啡机蒸汽声\n#街角秘境 #咖啡馆日常"
+    },
+    {
+      "turn_id": 5,
+      "role": "user",
+      "content": "定稿！把铁艺桌椅、绿色花箱也写进去，确保所有元素都点到"
+    },
+    {
+      "turn_id": 6,
+      "role": "assistant",
+      "content": "🏡【石板路与咖啡香的相遇】\n穿过拱廊的瞬间被暖黄灯光拥住\n铁艺桌椅旁绿萝垂落进玻璃窗\nCOFFEE SHOP的黑色菜单板写着\n\"今天该选美式还是拿铁？\"\n石缝间钻出的野花与蓝色花盆相映成趣\n风铃摇晃时突然想起\n原来城市最好的BGM是咖啡机蒸汽声\n#街角秘境 #咖啡馆日常\n你心中的完美午后是什么味道？"
+    }
+  ],
+  "final_output": {
+    "output_type": "创作文案",
+    "answer": "🏡【石板路与咖啡香的相遇】\n穿过拱廊的瞬间被暖黄灯光拥住\n铁艺桌椅旁绿萝垂落进玻璃窗\nCOFFEE SHOP的黑色菜单板写着\n\"今天该选美式还是拿铁？\"\n石缝间钻出的野花与蓝色花盆相映成趣\n风铃摇晃时突然想起\n原来城市最好的BGM是咖啡机蒸汽声\n#街角秘境 #咖啡馆日常\n你心中的完美午后是什么味道？",
+    "evidence": [
+      {
+        "image_id": "img_001",
+        "evidence_text": "画面左下角及中央可见深色铁艺框架的桌椅组合。"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "右侧台阶边缘摆放着多个种植了绿植的长方形花箱（颜色偏深绿/蓝灰）。"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "前景右侧立着一块A字形黑板菜单，上书英文 COFFEE SHOP 及饮品名称 espresso, latte 等。"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "地面铺设的是不规则拼接的鹅卵石路面。"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "店铺门廊上方挂有'Hotel Le Petit Palace'字样的盾形招牌。"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "门口放置着一个白色的塑料桶/容器，内部装有物品。"
+      }
+    ]
+  },
+  "meta": {
+    "qa_status": "format_pass",
+    "review_queue": true,
+    "language": "zh",
+    "turn_count": 6,
+    "image_count": 1,
+    "difficulty": "中等",
+    "routed_task_type": "看图创作",
+    "route_confidence": 0.9,
+    "route_reason": "图片为富有生活气息的街景摄影，无明显强功能性文本或数据图表，结合目录 prior 倾向及图片氛围感，适合基于视觉内容进行创意写作或描述。",
+    "source_paths": [
+      "生活场景/0026a_cobblestone_street_with_outdoor_cafe_t.jpg"
+    ]
+  }
+}

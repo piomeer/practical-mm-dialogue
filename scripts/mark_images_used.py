@@ -62,13 +62,22 @@ def resolve_rel_path(path_arg: str) -> str | None:
     return None
 
 
-def paths_from_samples() -> list[str]:
+def paths_from_samples(*, require_human_pass: bool = True) -> list[str]:
     found: list[str] = []
     if not SAMPLES_DIR.is_dir():
         print(f"samples dir missing: {SAMPLES_DIR}", file=sys.stderr)
         return found
     for jp in sorted(SAMPLES_DIR.glob("practical_mm_dialogue_*.json")):
         data = json.loads(jp.read_text(encoding="utf-8"))
+        meta = data.get("meta") if isinstance(data.get("meta"), dict) else {}
+        qs = meta.get("qa_status")
+        if require_human_pass and qs != "human_pass":
+            print(
+                f"skip {jp.name}: qa_status={qs!r} (need human_pass; "
+                f"use --allow-format-pass to override)",
+                file=sys.stderr,
+            )
+            continue
         for img in data.get("images") or []:
             ip = img.get("image_path") or ""
             name = Path(ip).name
@@ -137,12 +146,17 @@ def main() -> int:
         action="store_true",
         help="从 samples/*.json 的 image_path 文件名匹配 data/ 并归档",
     )
+    parser.add_argument(
+        "--allow-format-pass",
+        action="store_true",
+        help="允许归档尚未 human_pass 的样本配图（默认仅 human_pass）",
+    )
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
     rels: list[str] = []
     if args.from_samples:
-        rels.extend(paths_from_samples())
+        rels.extend(paths_from_samples(require_human_pass=not args.allow_format_pass))
     for p in args.paths:
         rel = resolve_rel_path(p)
         if not rel:
@@ -151,7 +165,14 @@ def main() -> int:
         rels.append(rel)
 
     if not rels:
-        print("请提供 --paths 或 --from-samples", file=sys.stderr)
+        if args.from_samples and not args.paths:
+            print(
+                "没有可归档路径：--from-samples 未找到 human_pass 样本"
+                "（先人审 set_sample_qa_status，或加 --allow-format-pass）",
+                file=sys.stderr,
+            )
+        else:
+            print("请提供 --paths 或 --from-samples", file=sys.stderr)
         return 2
 
     # unique preserve order

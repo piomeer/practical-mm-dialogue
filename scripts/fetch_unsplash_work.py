@@ -131,6 +131,23 @@ def download_file(session: requests.Session, url: str, dest: Path) -> None:
                     f.write(chunk)
 
 
+def pick_file_url(photo: dict, *, min_short_side: int) -> str | None:
+    """Prefer a URL likely to keep short side >= min_short_side (regular is often ~1080w)."""
+    urls = photo.get("urls") or {}
+    full = urls.get("full")
+    raw = urls.get("raw")
+    regular = urls.get("regular")
+    target_long = max(1600, int(min_short_side * 16 / 9) + 80)
+    for base in (full, raw, regular):
+        if not base:
+            continue
+        if "images.unsplash.com" in base:
+            sep = "&" if "?" in base else "?"
+            return f"{base}{sep}w={target_long}&fit=max&q=80"
+        return base
+    return urls.get("small")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Unsplash → data/工作场景/")
     parser.add_argument("--limit", type=int, default=20, help="本次最多新下载张数")
@@ -142,6 +159,12 @@ def main() -> None:
     )
     parser.add_argument("--sleep", type=float, default=0.8, help="请求间隔秒")
     parser.add_argument("--per-page", type=int, default=10, help="每页条数(<=30)")
+    parser.add_argument(
+        "--min-short-side",
+        type=int,
+        default=720,
+        help="最短边像素下限（不含更小；与 data_lt720 规则一致）",
+    )
     args = parser.parse_args()
 
     key = load_key()
@@ -207,6 +230,16 @@ def main() -> None:
             if not pid or pid in seen_ids:
                 continue
 
+            api_w = photo.get("width")
+            api_h = photo.get("height")
+            if (
+                isinstance(api_w, int)
+                and isinstance(api_h, int)
+                and min(api_w, api_h) < args.min_short_side
+            ):
+                seen_ids.add(pid)
+                continue
+
             alt = photo.get("alt_description") or photo.get("description") or query
             slug = slugify(alt if isinstance(alt, str) else query)
             filename = f"{next_idx:04d}{slug}.jpg"
@@ -216,16 +249,14 @@ def main() -> None:
                 filename = f"{next_idx:04d}{slug}.jpg"
                 dest = OUT_DIR / filename
 
-            urls = photo.get("urls") or {}
-            # prefer regular for size; fall back to full/raw
-            file_url = urls.get("regular") or urls.get("full") or urls.get("small")
+            file_url = pick_file_url(photo, min_short_side=args.min_short_side)
             download_loc = (photo.get("links") or {}).get("download_location")
             if not file_url:
                 continue
 
             try:
                 if download_loc:
-                    file_url = trigger_download(session, download_loc)
+                    trigger_download(session, download_loc)
                     time.sleep(args.sleep)
                 download_file(session, file_url, dest)
             except Exception as e:
@@ -236,8 +267,25 @@ def main() -> None:
                 time.sleep(args.sleep)
                 continue
 
-            w = photo.get("width")
-            h = photo.get("height")
+            try:
+                from PIL import Image
+
+                with Image.open(dest) as im:
+                    w, h = im.size
+            except Exception as e:
+                print(f"[open fail] {filename}: {e}", file=sys.stderr)
+                dest.unlink(missing_ok=True)
+                continue
+
+            if min(w, h) < args.min_short_side:
+                print(
+                    f"[skip small] {filename}: {w}x{h} short_side<{args.min_short_side}",
+                    file=sys.stderr,
+                )
+                dest.unlink(missing_ok=True)
+                seen_ids.add(pid)
+                continue
+
             license_note = "Unsplash License (https://unsplash.com/license)"
             row = {
                 "local_path": f"{CATEGORY}/{filename}",
@@ -257,7 +305,8 @@ def main() -> None:
             seen_ids.add(pid)
             next_idx += 1
             saved += 1
-            print(f"saved {saved}/{args.limit}: {filename} (query={query}, id={pid})")
+            failures = 0
+            print(f"saved {saved}/{args.limit}: {filename} ({w}x{h}, query={query}, id={pid})")
             time.sleep(args.sleep)
 
     print(f"完成：新下载 {saved} 张 → {OUT_DIR}")

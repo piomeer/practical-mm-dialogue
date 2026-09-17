@@ -1,0 +1,61 @@
+{
+  "sample_id": "practical_mm_dialogue_000019",
+  "task_type": "逻辑推理",
+  "scenario": "学习",
+  "images": [
+    {
+      "image_id": "img_001",
+      "image_path": "images/0028chartqa_2429.jpg"
+    }
+  ],
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "role": "user",
+      "content": "<image>请分析这张跨国合作态度趋势图：美国民众和德国民众在 2017-2019 年间对跨洋合作的意愿变化趋势如何？需要具体比较双方的年度数据差异。"
+    },
+    {
+      "turn_id": 2,
+      "role": "assistant",
+      "content": "根据图表数据显示，2017 年至 2019 年间，美国民众认为‘美国应与德国加强合作’的比例分别为 65%（2017）、70%（2018）和 69%（2019），整体保持在 65% 以上的高位。相比之下，德国方面认为‘德国应与美加强合作’的比例则波动明显，从 2017 年的 56% 降至 2018 年的 41%，随后在 2019 年回升至 50%。这表明美国民众的合作意愿相对稳定且高于德国方面。"
+    },
+    {
+      "turn_id": 3,
+      "role": "user",
+      "content": "为什么德国方的合作意愿会持续下降（2017-2018）？这是否与当时特定的政治环境相关？"
+    },
+    {
+      "turn_id": 4,
+      "role": "assistant",
+      "content": "当前图表仅提供民意调查数据趋势，并未包含任何政治背景或社会动因的注释。根据规则限制，我们无法通过此可视化材料推断因果关系，因此关于德国比例下降的具体原因属于图中未提供的信息范畴。"
+    }
+  ],
+  "final_output": {
+    "output_type": "推理结论",
+    "answer": "当前图表仅提供民意调查数据趋势，并未包含任何政治背景或社会动因的注释。根据规则限制，我们无法通过此可视化材料推断因果关系，因此关于德国比例下降的具体原因属于图中未提供的信息范畴。",
+    "evidence": [
+      {
+        "image_id": "img_001",
+        "evidence_text": "图表标题为'Americans more open to cooperation with Germany than vice versa'，下方数据行显示 2017-2019 年美国民众对合作意愿的具体数值（65, 70, 69）和德国数值（56, 41, 50）。"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "图表底部'Source'注明数据来源为 Pew Research Center 和 Körber-Stiftung 的调查，仅提及调查时间（2019 年 9 月），未在图表内文字说明政治背景或下降动因。"
+      }
+    ]
+  },
+  "meta": {
+    "qa_status": "format_pass",
+    "review_queue": true,
+    "language": "zh",
+    "turn_count": 4,
+    "image_count": 1,
+    "difficulty": "中等",
+    "routed_task_type": "逻辑推理",
+    "route_confidence": 0.9,
+    "route_reason": "图片为折线统计图表，展示跨国合作意愿的趋势数据，依据规则6优先判定为逻辑推理。",
+    "source_paths": [
+      "图表推理/0028chartqa_2429.jpg"
+    ]
+  }
+}

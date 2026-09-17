@@ -1,0 +1,83 @@
+{
+  "sample_id": "practical_mm_dialogue_000018",
+  "task_type": "信息提取与整理",
+  "scenario": "学习",
+  "images": [
+    {
+      "image_id": "img_001",
+      "image_path": "images/0304slide_basicsofautomobilever2compatibilit.jpg"
+    }
+  ],
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "role": "user",
+      "content": "<image>这张 PPT 幻灯片展示了发动机参数的相关内容，请先帮我梳理一下图片里的文字有哪些关键术语？"
+    },
+    {
+      "turn_id": 2,
+      "role": "assistant",
+      "content": "图片清晰列出了几个关键的发动机参数，包括：\n- BORE (气缸直径)\n- STROKE (活塞行程)\n- CAPACITY (排量/CAPACITY/cc)\n- CLEARANCE VOLUME (余隙体积)\n- COMPRESSION RATIO (压缩比)\n- VALVE MECHANISM (气门机构)\n- TIMING SYSTEM (配气正时系统)\n这些条目都附带了具体的英文定义和单位说明。"
+    },
+    {
+      "turn_id": 3,
+      "role": "user",
+      "content": "很好，请把上面提到的所有参数按照‘参数名称、定义原文、单位、备注’整理成一个完整的 Markdown 表格，我要拿去写报告，请直接给成品。"
+    },
+    {
+      "turn_id": 4,
+      "role": "assistant",
+      "content": "# ENGINE PARAMETERS 参数整理表\n| 参数名称 | 定义原文 | 单位 | 备注 |\n|---|---|---|---|\n| BORE | The diameter of the cylinder | mm | 红色字体标识 |\n| STROKE | The distance between top most point of piston travel to the bottommost point of piston movement | mm | 底部拼写保留 bottommost |\n| CAPACITY | Also called displacement. The volume displaced by all pistons while moving from top to bottom. Also indicated in Liters | cc | 提及也可用 Liters 表示 |\n| CLEARANCE VOLUME | The volume available above piston, with the piston in top most point | / | 无独立单位 |\n| COMPRESSION RATIO | The ratio between the total volume to the clearance volume | / | 比值概念 |\n| VALVE MECHANISM | The mechanism by which the valves are operated. It could be push rod type or overhead camshaft type | / | 蓝色标注两种类型 |\n| TIMING SYSTEM | The mechanism by which the camshaft & fuel injection pump are operated . It could be gear driven, chain driven or belt driven | / | 三种驱动方式并列 |\n这就是您需要的完整表格数据。"
+    }
+  ],
+  "final_output": {
+    "output_type": "表格",
+    "answer": "# ENGINE PARAMETERS 参数整理表\n| 参数名称 | 定义原文 | 单位 | 备注 |\n|---|---|---|---|\n| BORE | The diameter of the cylinder | mm | 红色字体标识 |\n| STROKE | The distance between top most point of piston travel to the bottommost point of piston movement | mm | 底部拼写保留 bottommost |\n| CAPACITY | Also called displacement. The volume displaced by all pistons while moving from top to bottom. Also indicated in Liters | cc | 提及也可用 Liters 表示 |\n| CLEARANCE VOLUME | The volume available above piston, with the piston in top most point | / | 无独立单位 |\n| COMPRESSION RATIO | The ratio between the total volume to the clearance volume | / | 比值概念 |\n| VALVE MECHANISM | The mechanism by which the valves are operated. It could be push rod type or overhead camshaft type | / | 蓝色标注两种类型 |\n| TIMING SYSTEM | The mechanism by which the camshaft & fuel injection pump are operated . It could be gear driven, chain driven or belt driven | / | 三种驱动方式并列 |",
+    "evidence": [
+      {
+        "image_id": "img_001",
+        "evidence_text": "BORE, mm : The diameter of the cylinder"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "STROKE, mm : The distance between top most point of piston travel to the bottommost point of piston movement"
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "CAPACITY, cc : Also called displacement. The volume displaced by all pistons while moving from top to bottom. Also indicated in Liters."
+      },
+      {
+        "image_id": "img_001",
+        "evidence_text": "TIMING SYSTEM : The mechanism by which the camshaft & fuel injection pump are operated . It could be gear driven, chain driven or belt driven."
+      }
+    ]
+  },
+  "meta": {
+    "qa_status": "format_pass",
+    "review_queue": true,
+    "language": "zh",
+    "turn_count": 4,
+    "image_count": 1,
+    "difficulty": "中等",
+    "routed_task_type": "信息提取与整理",
+    "route_confidence": 0.9,
+    "route_reason": "图片为发动机基础参数定义的文档截图，适合按条目提取术语及解释进行结构化整理。",
+    "source_paths": [
+      "文档截图/0304slide_basicsofautomobilever2compatibilit.jpg"
+    ],
+    "ocr_spotcheck": {
+      "api_ok": true,
+      "verified": false,
+      "category": "文档截图",
+      "image": "data/文档截图/0304slide_basicsofautomobilever2compatibilit.jpg",
+      "header_person_name": "",
+      "merchant_legal_name": "ENGINE PARAMETERS",
+      "key_numbers": [],
+      "notes": "文档为技术参数定义说明，无具体数值或单据编号",
+      "checked_at": "2026-09-17T03:07:51.445025+00:00",
+      "model": "qwen3.5-flash",
+      "tokens": 2751,
+      "note": "api_ok only means the VL call returned JSON; verified is always false in this script"
+    }
+  }
+}

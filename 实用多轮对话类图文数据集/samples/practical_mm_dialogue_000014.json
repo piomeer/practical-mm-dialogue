@@ -1,80 +1,61 @@
 {
   "sample_id": "practical_mm_dialogue_000014",
   "task_type": "逻辑推理",
-  "scenario": "学习",
+  "scenario": "生活",
   "images": [
     {
       "image_id": "img_001",
       "image_path": "images/0001chartqa_10095.jpg"
     }
   ],
-  "dialogue": [
-    {
-      "role": "user",
-      "content": "<image>请分析这个图表中美国对华好感度和不好感度的变化趋势，并指出关键转折点。",
-      "turn_id": 1
-    },
-    {
-      "role": "assistant",
-      "content": "图表展示了2005至2015年间美国民众对中国\"好感度\"（绿色线）与\"不好感度\"（橙色线）的比例变化。需重点观察哪几年的数据？",
-      "turn_id": 2
-    },
-    {
-      "role": "user",
-      "content": "请找出2009年和2013年的好感度与不好感度数值，并说明这两年间趋势有何差异。",
-      "turn_id": 3
-    },
-    {
-      "role": "assistant",
-      "content": "2009年好感度50% vs 不好感度38%；2013年好感度40% vs 不好感度52%。十年间出现从\"好感主导\"转向\"不看好主导\"的趋势逆转。",
-      "turn_id": 4
-    },
-    {
-      "role": "user",
-      "content": "为什么在2013年之后，美国对华好感度持续下降？可能的原因是什么？",
-      "turn_id": 5
-    },
-    {
-      "role": "assistant",
-      "content": "图表未给出因果说明，仅显示数据变化。根据视觉呈现可知2015年好感度降至38%（历史最低），不好感度升至54%（历史最高）。",
-      "turn_id": 6
-    },
-    {
-      "role": "user",
-      "content": "请综合上述分析，总结美国对中国的看法在这一时期内的整体趋势。",
-      "turn_id": 7
-    },
-    {
-      "role": "assistant",
-      "content": "1. 2005-2011年：好感与不好感交替波动（最大差值21%）；2. 2013年起明显反转，好感持续下滑且差距扩大至16个百分点；3. 终点值显示极端分化（54%vs38%）。",
-      "turn_id": 8
-    }
-  ],
   "final_output": {
     "output_type": "推理结论",
-    "answer": "1. 2005-2011年：好感与不好感交替波动（最大差值21%）；2. 2013年起明显反转，好感持续下滑且差距扩大至16个百分点；3. 终点值显示极端分化（54%vs38%）。",
+    "answer": "基于图表数据：1)2005年正面评价领先（43%>35%）2)2011年前后维持微弱优势（最高51%vs36%）3)2013年发生质变（负面52%首次显著超正面40%）4)2015年差距持续扩大（54% vs38%）。主要转折点出现在2013年，此前整体保持正面评价优势，此后转为持续负面主导。",
     "evidence": [
       {
         "image_id": "img_001",
-        "evidence_text": "2005年起点数据显示好感度43%，不好感度35%；2013年数据发生逆转，好感度37%降至低于不好感度52%；2015年终点数据显示好感度38%，不好感度54%，形成极端分化格局。"
+        "evidence_text": "图表显示2005年正面评价（绿色线）43%高于负面（橙色线）35%，2015年转为负面54%高于正面38%"
       },
       {
         "image_id": "img_001",
-        "evidence_text": "图表标题 \"Americans Give China Mostly Negative Ratings\" 及 \"U.S. views of China\"，Source: Spring 2015 Global Attitudes survey. Q12b. PEW RESEARCH CENTER。"
+        "evidence_text": "2013年负面评价首次持续高于正面（52% vs 40%），此后差距持续扩大"
       }
     ]
   },
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "role": "user",
+      "content": "<image>请分析这张美国对华态度变化的折线图，说明关键时间节点的数据转折点。"
+    },
+    {
+      "turn_id": 2,
+      "role": "assistant",
+      "content": "观察图表可知，美国民众对华态度存在明显的趋势分化。绿色线代表正面评价（Favorable），整体呈波动下降走势；橙色线代表负面评价（Unfavorable），整体呈上升趋势。两者在图表中段位置发生交叉，显示了公众意见的逆转。"
+    },
+    {
+      "turn_id": 3,
+      "role": "user",
+      "content": "请具体分析哪些年份体现了这种转折，并给出关键的百分比数据对比作为依据。"
+    },
+    {
+      "turn_id": 4,
+      "role": "assistant",
+      "content": "基于图表数据：1)2005年正面评价领先（43%>35%）2)2011年前后维持微弱优势（最高51%vs36%）3)2013年发生质变（负面52%首次显著超正面40%）4)2015年差距持续扩大（54% vs38%）。主要转折点出现在2013年，此前整体保持正面评价优势，此后转为持续负面主导。"
+    }
+  ],
   "meta": {
+    "qa_status": "format_pass",
+    "review_queue": true,
     "language": "zh",
-    "turn_count": 8,
+    "turn_count": 4,
     "image_count": 1,
     "difficulty": "中等",
     "routed_task_type": "逻辑推理",
-    "route_confidence": 0.95,
-    "route_reason": "遵循规则6，折线图涉及趋势对比与分析，应优先归类为逻辑推理；目录 prior 也指向逻辑推理。",
+    "route_confidence": 0.9,
+    "route_reason": "这是一张包含趋势数据的折线图，主要涉及数据间的对比与变化规律分析，根据规则6优先判定为逻辑推理任务。",
     "source_paths": [
       "图表推理/0001chartqa_10095.jpg"
-    ],
-    "qa_status": "format_pass"
+    ]
   }
 }

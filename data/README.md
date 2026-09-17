@@ -4,14 +4,15 @@
 
 **暂停采集：** `学习材料/`、`代码报错/`（学习非必须；报错尚无合适批量源）。
 
-## 未用 / 已用池
+## 未用 / 已用 / 短边隔离池
 
 | 目录 | 含义 |
 |------|------|
 | `data/` | **未用池**：写对话、配对只从这里取图 |
 | `data_used/` | **已用池**：样本写完后把对应图**移动**到此（分类结构与 `data/` 相同） |
+| `data_lt720/` | **短边小于 720**：从 `data/` 移出，`min(w,h) < 720`（不含 720），结构同 `data/` |
 
-`data/_meta/index.jsonl` 中对应行会标 `"used": true`，`source_id` 保留，采集脚本不会重复下载。
+`data/_meta/index.jsonl` 中对应行会标 `"used": true` 或 `"short_side_lt720": true`，`source_id` 保留，采集脚本不会重复下载。
 
 ```bash
 # 按路径归档
@@ -25,32 +26,19 @@
 
 | 类型 | 主力源 | 补充源 |
 |------|--------|--------|
-| 工作/生活场景图 | **Wikimedia Commons**（开放许可、可批量） | Unsplash API（Demo 约 50 次/小时，仅补缺） |
-| 收据 | ICDAR2019-SROIE | 手动票 |
-| 图表推理 | ChartQA | — |
-| 文档截图 | SlideVQA（VisRAG corpus） | — |
+| 工作/生活场景图 | **Wikimedia Commons** | Unsplash、**Pexels（size=large）** |
+| 收据 | ICDAR2019-SROIE | **CORD v2** |
+| 图表推理 | **PlotQA**（优先高清） | ChartQA（多数短边不足，易进 lt720） |
+| 文档截图 | SlideVQA | **DocLayNet-v1.2**、**DocVQA**、**InfographicVQA** |
 | 代码报错 | 后续自采 | — |
 
-**不要把 Unsplash 当场景图主力。**
+**不要用 CharXiv 入库：** 官方仅允许评估、禁止训练；图版权属 arXiv 原作者。
 
-## 目录现状（各约 500 已达成）
-
-| 文件夹 | 张数 | 用途 | 当前来源 |
-|--------|------|------|----------|
-| `生活场景/` | ~502 未用（+4 已用） | 看图创作 / 生活实用 | Wikimedia（主）+ Unsplash（少） |
-| `工作场景/` | ~500 未用 | 看图创作 / 工作实用 | Wikimedia Commons |
-| `收据/` | ~498 未用（+2 已用） | 信息提取 | SROIE |
-| `文档截图/` | ~500 未用 | 提取 / 翻译 | SlideVQA |
-| `图表推理/` | ~500 未用 | 逻辑推理 | ChartQA |
-| `学习材料/` | 0 | 翻译 / 学习 | **暂停** |
-| `代码报错/` | 0 | 代码 debug | **暂停** |
-| `_meta/` | — | 来源与许可索引 | `index.jsonl`（含 `used`） |
-
-**结论：** 上述五类用现有源即可撑到 500，暂不需要新开数据源。学习材料 / 代码报错若恢复采集再另选源。
+**不要把 Unsplash 当场景图主力**（Demo 配额小）；批量补场景优先 Pexels / Wikimedia。
 
 ## 命名与元数据
 
-文件夹内四位编号 + 短名。`source`：`wikimedia` / `unsplash` / `sroie` / `chartqa` / `slidevqa` / `manual`。
+文件夹内四位编号 + 短名。`source` 常见值：`wikimedia` / `unsplash` / `pexels` / `sroie` / `cord_v2` / `chartqa` / `plotqa` / `slidevqa` / `doclaynet` / `docvqa` / `infographicvqa` / `manual`。
 
 ## 场景图：Wikimedia（主力）
 
@@ -62,36 +50,53 @@
 - 只保留 CC0 / Public Domain / CC-BY（排除 NC）
 - 请遵守 Commons 礼貌限速；遇 429 增大 `--sleep`
 
+## 场景图：Pexels（高清补充，推荐）
+
+```bash
+.venv/bin/python scripts/fetch_pexels_lifestyle.py --limit 20 --per-page 40 --sleep 0.5
+.venv/bin/python scripts/fetch_pexels_work.py --limit 20 --per-page 40 --sleep 0.5
+```
+
+需 `.env` 中 `PEXELS_API_KEY`（https://www.pexels.com/api/）。默认 `size=large`、`--min-short-side 720`。
+
 ## 场景图：Unsplash（补充）
 
 ```bash
-.venv/bin/python scripts/fetch_unsplash_lifestyle.py --limit 20
-.venv/bin/python scripts/fetch_unsplash_work.py --limit 20
+.venv/bin/python scripts/fetch_unsplash_lifestyle.py --limit 20 --per-page 30 --sleep 1.0
+.venv/bin/python scripts/fetch_unsplash_work.py --limit 20 --per-page 30 --sleep 1.0
 ```
 
-需 `.env` 中 `UNSPLASH_ACCESS_KEY`；Demo 配额很小。
+需 `.env` 中 `UNSPLASH_ACCESS_KEY`。Demo 约 50 次请求/小时。
 
-## SROIE → 收据
+## 收据：SROIE / CORD v2
 
 ```bash
 .venv/bin/python scripts/fetch_sroie_receipts.py --limit 100 --split train
+.venv/bin/python scripts/fetch_cord_v2.py --limit 100 --split train --min-short-side 720
 ```
 
-## ChartQA → 图表推理
+## 图表：PlotQA（优先）/ ChartQA
 
 ```bash
+# PlotQA 原图短边多在 600–719，默认 --min-short-side 600
+.venv/bin/python scripts/fetch_plotqa.py --limit 100 --split validation --min-short-side 600
 .venv/bin/python scripts/fetch_chartqa.py --limit 100 --split train
 ```
 
-## SlideVQA → 文档截图
+## 文档：SlideVQA / DocLayNet / DocVQA / InfographicVQA
 
 ```bash
 .venv/bin/python scripts/fetch_slidevqa.py --limit 100
+.venv/bin/python scripts/fetch_doclaynet.py --limit 100 --split validation --min-short-side 720
+.venv/bin/python scripts/fetch_docvqa.py --limit 50 --config DocVQA --split validation
+.venv/bin/python scripts/fetch_docvqa.py --limit 50 --config InfographicVQA --split validation
 ```
+
+DocLayNet 使用可流式的 `docling-project/DocLayNet-v1.2`（勿用已废弃的 DocLayNet.py 脚本数据集）。可选在 `.env` 设置 `HF_TOKEN` 提高 Hugging Face 限速。
 
 ## 校验
 
 ```bash
 .venv/bin/python scripts/validate_data_meta.py
-# 会分别统计 data/（未用）与 data_used/（已用）；used=true 的文件应在 data_used/
+# 分别统计 data/、data_used/、data_lt720/；short_side_lt720=true 应在 data_lt720/
 ```
