@@ -55,7 +55,7 @@ def existing_source_ids(rows: list[dict], source: str) -> set[str]:
 
 
 def next_index_for_category(rows: list[dict], category: str) -> int:
-    pattern = re.compile(r"^(\d{4})")
+    pattern = re.compile(r"^(\d{4,5})(?=[A-Za-z])")
     max_n = 0
     cat_dir = DATA / category
     if cat_dir.exists():

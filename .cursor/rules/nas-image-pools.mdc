@@ -1,0 +1,33 @@
+---
+description: 图片三池与 NAS 冷存映射；找图先本地后 NAS，勿把空目录当无数据
+globs: data/**,data_used/**,data_lt720/**,实用多轮对话类图文数据集/samples/images/**
+alwaysApply: true
+---
+
+# NAS 图片池导航
+
+本地盘紧张时，稳定存量会迁到 NAS 腾盘；采集仍可能往本地写新图。
+
+## SMB / 挂载
+
+- URI: `smb://192.168.31.13/家庭共享/实用多轮对话类图文数据集`
+- 环境变量: `NAS_ROOT`（见 `.env`，常见 `/Volumes/家庭共享/实用多轮对话类图文数据集`）
+- 各池钩子: `data/NAS_MIRROR.md`、`data_used/NAS_MIRROR.md`、`data_lt720/NAS_MIRROR.md`、`samples/images/NAS_MIRROR.md` 与同目录 `.nas_root`
+
+## 路径映射
+
+| 本地 | NAS |
+|------|-----|
+| `data/<类别>/<文件>` | `$NAS_ROOT/cold/data/<类别>/<文件>` |
+| `data_used/<类别>/<文件>` | `$NAS_ROOT/cold/data_used/<类别>/<文件>` |
+| `data_lt720/<类别>/<文件>` | `$NAS_ROOT/cold/data_lt720/<类别>/<文件>` |
+
+## 查找顺序（必须遵守）
+
+1. 若本地路径文件存在且 size&gt;0 → 用本地
+2. 否则读 `.nas_root` 或 `$NAS_ROOT`，打开对应 `cold/<pool>/...`
+3. **禁止**因本地目录空或文件很少就断定「没有这类图」
+
+## 合格状态
+
+样本 `qa_status=agent_pass`（或历史 `human_pass`）为合格；账本见 `data/_meta/image_inventory.jsonl`。

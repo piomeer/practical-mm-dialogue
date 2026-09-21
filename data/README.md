@@ -8,9 +8,25 @@
 
 | 目录 | 含义 |
 |------|------|
-| `data/` | **未用池**：写对话、配对只从这里取图 |
-| `data_used/` | **已用池**：样本写完后把对应图**移动**到此（分类结构与 `data/` 相同） |
-| `data_lt720/` | **短边小于 720**：从 `data/` 移出，`min(w,h) < 720`（不含 720），结构同 `data/` |
+| `data/` | **未用池**：写对话、配对只从这里取图（采集写入根，勿改） |
+| `data_used/` | **已用池**：`agent_pass`/`human_pass` 后 `mark_images_used` 移入 |
+| `data_lt720/` | **短边小于 720**：从 `data/` 移出 |
+
+### NAS 冷存与钩子
+
+本地盘满时，**mtime 足够旧**的稳定图会迁到：
+
+`smb://192.168.31.13/家庭共享/实用多轮对话类图文数据集/cold/<pool>/`
+
+本目录有 `NAS_MIRROR.md` 与 `.nas_root`。查找顺序：**本地文件存在 → 本地；否则 → NAS**。采集可继续往本地写新图；迁移脚本默认跳过最近约 45 分钟内改动的文件。
+
+```bash
+.venv/bin/python scripts/nas_migrate_stable.py --dry-run
+.venv/bin/python scripts/nas_migrate_stable.py --pool data_used
+.venv/bin/python scripts/rebuild_image_inventory.py
+```
+
+账本：`data/_meta/image_inventory.jsonl`（`qualified` = `agent_pass`/`human_pass`）。
 
 `data/_meta/index.jsonl` 中对应行会标 `"used": true` 或 `"short_side_lt720": true`，`source_id` 保留，采集脚本不会重复下载。
 

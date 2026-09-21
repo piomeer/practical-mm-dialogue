@@ -16,6 +16,8 @@ import requests
 from dotenv import load_dotenv
 from PIL import Image
 
+Image.MAX_IMAGE_PIXELS = None
+
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 OUT_DIR = DATA / "工作场景"
@@ -33,6 +35,36 @@ DEFAULT_QUERIES = [
     "laptop work",
     "whiteboard",
     "remote work",
+    "conference call",
+    "open office",
+    "startup office",
+    "home office desk",
+    "typing keyboard",
+    "office window",
+    "team collaboration",
+    "presentation screen",
+    "office corridor",
+    "standing desk",
+    "office plants",
+    "business handshake",
+    "coding desk",
+    "notebook pen desk",
+    "zoom meeting",
+    "office cafeteria",
+    "reception lobby",
+    "boardroom table",
+    "designer workspace",
+    "architect desk",
+    "library study",
+    "warehouse office",
+    "call center",
+    "printer scanner",
+    "office coffee break",
+    "brainstorm sticky notes",
+    "dual monitor setup",
+    "ergonomic chair",
+    "corporate lobby",
+    "workshop training",
 ]
 
 
@@ -77,7 +109,7 @@ def existing_source_ids(rows: list[dict]) -> set[str]:
 
 
 def next_index_for_category(rows: list[dict], category: str) -> int:
-    pattern = re.compile(r"^(\d{4})")
+    pattern = re.compile(r"^(\d{4,5})(?=[A-Za-z])")
     max_n = 0
     cat_dir = DATA / category
     if cat_dir.exists():
@@ -121,6 +153,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Pexels → data/工作场景/")
     parser.add_argument("--limit", type=int, default=20, help="本次最多新下载张数")
     parser.add_argument(
+        "--fill-to",
+        type=int,
+        default=0,
+        help="将本目录图片总数补到该值（优先于 --limit；按磁盘现有张数计算缺口）",
+    )
+    parser.add_argument(
         "--queries",
         type=str,
         default=",".join(DEFAULT_QUERIES),
@@ -147,6 +185,18 @@ def main() -> None:
     next_idx = next_index_for_category(rows, CATEGORY)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
+    if args.fill_to > 0:
+        have = sum(
+            1
+            for p in OUT_DIR.iterdir()
+            if p.is_file() and p.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp"}
+        )
+        args.limit = max(0, args.fill_to - have)
+        print(f"目录已有 {have}，fill-to={args.fill_to} → 本次 limit={args.limit}", flush=True)
+        if args.limit == 0:
+            print("已达目标，无需下载。", flush=True)
+            return
+
     session = requests.Session()
     session.headers.update(
         {
@@ -157,16 +207,23 @@ def main() -> None:
 
     saved = 0
     page_by_query = {q: 1 for q in queries}
+    exhausted = set()
     q_cycle = 0
     failures = 0
+    idle_rounds = 0
 
     print(f"目标目录: {OUT_DIR}", flush=True)
     print(f"已有 pexels id: {len(seen_ids)}；本次 limit={args.limit}", flush=True)
 
     while saved < args.limit:
-        query = queries[q_cycle % len(queries)]
+        active = [q for q in queries if q not in exhausted]
+        if not active:
+            print("所有 query 已翻尽或无新图，停止。", file=sys.stderr, flush=True)
+            break
+        query = active[q_cycle % len(active)]
         q_cycle += 1
         page = page_by_query[query]
+        before = saved
         try:
             r = session.get(
                 f"{API}/search",
@@ -180,7 +237,9 @@ def main() -> None:
                 timeout=60,
             )
             r.raise_for_status()
-            results = r.json().get("photos") or []
+            payload = r.json()
+            results = payload.get("photos") or []
+            total = payload.get("total_results")
         except requests.HTTPError as e:
             code = e.response.status_code if e.response is not None else None
             failures += 1
@@ -195,10 +254,15 @@ def main() -> None:
             continue
 
         if not results:
-            page_by_query[query] = page + 1
-            if page > 50:
-                time.sleep(args.sleep)
+            exhausted.add(query)
+            print(f"[exhaust] query={query!r} page={page} 无结果", flush=True)
+            time.sleep(args.sleep)
             continue
+
+        if isinstance(total, int) and total >= 0:
+            max_page = max(1, (total + min(args.per_page, 80) - 1) // min(args.per_page, 80))
+            if page >= max_page:
+                exhausted.add(query)
 
         page_by_query[query] = page + 1
 
@@ -290,6 +354,15 @@ def main() -> None:
                 flush=True,
             )
             time.sleep(args.sleep)
+
+        if saved == before:
+            idle_rounds += 1
+            if idle_rounds >= len(active) * 3:
+                if page > 80:
+                    exhausted.add(query)
+                    print(f"[exhaust] query={query!r} 连续无新图且 page>{page}", flush=True)
+        else:
+            idle_rounds = 0
 
     print(f"完成：新下载 {saved} 张 → {OUT_DIR}", flush=True)
     if saved == 0:

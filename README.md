@@ -12,7 +12,27 @@
 | `data/`、`data_used/` | **目录骨架与 README**（大体量实图不入库，见下） |
 | `实用多轮对话类图文数据集/` | 任务与格式要求、样本 JSON + `samples/images` |
 
-**实图策略：** `data/`（未用池）与 `data_used/`（已用池）中的 JPG/PNG 仅保留在本地，约 800MB+，不推送 GitHub。Clone 后请自行运行采集脚本补图。
+**实图策略：** `data/`（未用池）与 `data_used/`（已用池）中的 JPG/PNG **默认不推送 GitHub**。本地盘紧张时，稳定存量迁到 NAS 冷存；采集仍可继续写本地新图。
+
+### NAS 冷存（腾盘）
+
+- SMB：`smb://192.168.31.13/家庭共享/实用多轮对话类图文数据集`
+- `.env`：`NAS_ROOT=/Volumes/家庭共享/实用多轮对话类图文数据集`
+- 布局：`$NAS_ROOT/cold/{data,data_used,data_lt720}/`
+- 钩子：各池 `NAS_MIRROR.md` / `.nas_root`；Cursor 规则 `.cursor/rules/nas-image-pools.mdc`
+- 查找：本地有文件用本地，否则去 NAS 对应 `cold/<pool>/`
+
+```bash
+# 干跑：预览将迁走的稳定文件（默认跳过最近 45 分钟内修改的文件，避免撞采集）
+.venv/bin/python scripts/nas_migrate_stable.py --dry-run
+
+# 腾盘迁移（**请在本机 Terminal.app 执行**；Cursor 沙箱无法写入 /Volumes SMB）
+./scripts/run_nas_migrate_in_terminal.sh --dry-run
+./scripts/run_nas_migrate_in_terminal.sh
+
+# 重建图账本（untouched / processed_unqualified / qualified；合格=agent_pass|human_pass）
+.venv/bin/python scripts/rebuild_image_inventory.py --also-nas-ledger
+```
 
 ## 质量分层（硬约定）
 
